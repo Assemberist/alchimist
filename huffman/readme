@@ -1,0 +1,2 @@
+Program use Huffman's algorithm to make table accordance "symbol-code". This algorithm may be used for compressing data. 
+!!! For correct program work create file "test.txt" in project foulder.
