@@ -1,0 +1,7 @@
+all: compile
+
+compile: main.o
+	gcc -o debug/dfl obj/main.o
+
+main.o:
+	gcc -c src/main.c -o obj/main.o
