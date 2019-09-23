@@ -33,13 +33,15 @@ group parse_group(FILE* file){
 
 	while(fgets(buff, 64, file)) capasity++;
 	gr.names = (char**)malloc(capasity * sizeof(char*));
-	
+
+	rewind(file);
+
 	while(gr.name_count < capasity)
 	{
 		gr.names[gr.name_count] = get_lexem(file, ':');
-		if(fgetc(file) == '1') gr.names[gr.name_count][0] += 128;
+		if(fgetc(file) == '0') gr.names[gr.name_count][0] += 128;
 		while(!feof(file))
-			if(sym == fgetc(file)) break;
+			if('\n' == fgetc(file)) break;
 		gr.name_count++;
 	}
 	return gr;
@@ -60,7 +62,7 @@ library load_library(){
 		return lib;
 	}
 	path[strlen(path)-9] = '\0';
-	
+
 	char group_name[PATH_MAX];
 	strcpy(group_name, path);
 	strcat(group_name, "groups");
@@ -137,5 +139,6 @@ library load_library(){
 				if(strstr(lib.groups[i].names[j], buff)) lib.recepts[lib.recept_count].rezult = lib.groups[i].names[j];
 	}
     fclose(reader);
+    puts("lib out");
 	return lib;
 }

@@ -1,7 +1,10 @@
 all: compile
 
-compile: main.o
-	gcc -o debug/dfl obj/main.o
+compile: object.o main.o objects
+	g++ -o debug/dfg $(ls obj/)
 
 main.o:
-	gcc -c src/main.c -o obj/main.o
+	g++ -c src/main.cpp -o obj/main.o
+
+object.o:
+	g++ -c src/object.cpp -o obj/object.o

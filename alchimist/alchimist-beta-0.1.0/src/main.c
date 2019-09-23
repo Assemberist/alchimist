@@ -3,6 +3,6 @@
 
 int main(){
 	library lib=load_library();
-    draw(&lib);
+	draw(&lib);
 	return 0;
 }
