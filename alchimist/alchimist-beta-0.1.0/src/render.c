@@ -9,7 +9,8 @@ char* choose_element(library* lib){
 	char buff[64];
 
 	puts("choose group\n");
-	for(i = 0; i < lib->group_count; i++) printf("%i) %s\n", i+1, lib->groups[i].name);
+	for(i = 0; i < lib->group_count; i++) 
+		printf("%i) %s\n", i+1, lib->groups[i].name);
 
 	gets(buff);
 	for(i = lib->group_count; i--;)
@@ -23,10 +24,11 @@ char* choose_element(library* lib){
 
 	puts(buff);
 
-	system("clear");
 	puts("choose element");
-	for(j = 0; j < lib->groups[i].name_count; j++) printf("%i) %s\n", j+1, lib->groups[i].names[j]);
-    
+	for(j = 0; j < lib->groups[i].name_count; j++) 
+		if(!(lib->groups[i].names[j][0] & 1<<7))
+			printf("%i) %s\n", j+1, lib->groups[i].names[j]);
+	
 	gets(buff);
 	for(j = lib->groups[i].name_count; j--;)
 		if(strstr(lib->groups[i].names[j], buff)) break;
@@ -42,7 +44,6 @@ void draw(library* lib){
 	system("clear");
 	puts("first element");
 	if(!(first = choose_element(lib))){
-		system("clear");
 		puts("wrong name");
 		return;
 	}
@@ -50,16 +51,21 @@ void draw(library* lib){
 
 	puts("twise element");
 	if(!(twice = choose_element(lib))){
-		system("clear");
 		puts("wrong name");
 		return;
 	}
-	if(!(rez = dualisation(lib, first, twice))){
-		system("clear");
+
+	printf("you choose %s\n", twice);
+	system("clear");
+	printf("%s + %s = ", first, twice);
+	puts(rez = dualisation(lib, first, twice));
+
+	if(!(dualisation(lib, first, twice))){
 		puts("wrong combinate");
 		return;
 	}
 	printf("you get %s\n", rez);
+
 }
 
 #endif

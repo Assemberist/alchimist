@@ -1,5 +1,17 @@
 #include "loader.h"
 
+char* find_lexem(library* lib, char* buff){
+	size_t i, j;
+	for(i = lib->group_count; i--;)
+		for(j = lib->groups[i].name_count; j--;){
+			if(strstr(lib->groups[i].names[j], buff)) return lib->groups[i].names[j];
+			buff[0] ^= 1<<7;
+			if(strstr(lib->groups[i].names[j], buff)) return lib->groups[i].names[j];
+			buff[0] ^= 1<<7;
+		}
+	return 0;
+}
+
 void read_lexem(FILE* file, char* buff, size_t buff_size, char stop_sym){
 	char sym;
 	while(buff_size--){
@@ -121,24 +133,16 @@ library load_library(){
 	lib.recepts = (combinate*)malloc(sizeof(combinate) * str_count);
 
 	for(lib.recept_count = 0; lib.recept_count < str_count; lib.recept_count++){
-		size_t i, j;
 		memset(buff, 0, 64);
 		read_lexem(reader, buff, 64, '+');
-		for(i = lib.group_count; i--;)
-			for(j = lib.groups[i].name_count; j--;)
-				if(strstr(lib.groups[i].names[j], buff)) lib.recepts[lib.recept_count].reagent1 = lib.groups[i].names[j];
+        lib.recepts[lib.recept_count].reagent1 = find_lexem(&lib, buff);
 		memset(buff, 0, 64);
 		read_lexem(reader, buff, 64, '=');
-		for(i = lib.group_count; i--;)
-			for(j = lib.groups[i].name_count; j--;)
-				if(strstr(lib.groups[i].names[j], buff)) lib.recepts[lib.recept_count].reagent2 = lib.groups[i].names[j];
+        lib.recepts[lib.recept_count].reagent2 = find_lexem(&lib, buff);
 		memset(buff, 0, 64);
 		read_lexem(reader, buff, 64, '\n');
-		for(i = lib.group_count; i--;)
-			for(j = lib.groups[i].name_count; j--;)
-				if(strstr(lib.groups[i].names[j], buff)) lib.recepts[lib.recept_count].rezult = lib.groups[i].names[j];
+        lib.recepts[lib.recept_count].rezult = find_lexem(&lib, buff);
 	}
-    fclose(reader);
-    puts("lib out");
+	fclose(reader);
 	return lib;
 }
