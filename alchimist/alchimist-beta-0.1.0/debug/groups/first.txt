@@ -1,4 +1,4 @@
-fire
-air
-water
-ground
+fire:1
+air:1
+water:1
+ground:1

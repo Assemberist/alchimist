@@ -1,5 +1,5 @@
-flex
-myst
-energy
-gryaz
-pil
+flex:0
+myst:0
+energy:0
+gryaz:0
+pil:0

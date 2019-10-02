@@ -25,28 +25,22 @@ char* get_lexem(FILE* file, char stop_sym){
 
 group parse_group(FILE* file){
 	group gr;
-	gr.names = (char**)malloc(32 * sizeof(char*));
 	gr.name_count = 0;
-	size_t capasity = 32;
+	size_t capasity = 0;
 	
 	char buff[64];
 	memset(buff, 0, 64);
 
-	while(fgets(buff, 64, file)){
-		char* new_line = (char*)malloc(strlen(buff));
-		strcpy(new_line, buff); new_line[strlen(buff)-1] = '\0';
-		if(gr.name_count == capasity){
-			capasity += 32;
-			char** help_wort = (char**)malloc(sizeof(char*) * capasity);
-			size_t i = 0;
-			while(i < gr.name_count) {
-				help_wort[i] = gr.names[i];
-				i++;
-			}
-			free(gr.names);
-			gr.names = help_wort;
-		}
-		gr.names[gr.name_count++] = new_line;
+	while(fgets(buff, 64, file)) capasity++;
+	gr.names = (char**)malloc(capasity * sizeof(char*));
+	
+	while(gr.name_count < capasity)
+	{
+		gr.names[gr.name_count] = get_lexem(file, ':');
+		if(fgetc(file) == '1') gr.names[gr.name_count][0] += 128;
+		while(!feof(file))
+			if(sym == fgetc(file)) break;
+		gr.name_count++;
 	}
 	return gr;
 }
