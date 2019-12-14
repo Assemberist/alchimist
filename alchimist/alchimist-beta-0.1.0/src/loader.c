@@ -108,7 +108,7 @@ library load_library(){
 			}
 			g = parse_group(reader);
 			g.name = (char*)malloc(strlen(f_cur->d_name) - 4);
-			strncat(g.name, f_cur->d_name, strlen(f_cur->d_name) - 4);
+			strncpy(g.name, f_cur->d_name, strlen(f_cur->d_name) - 4);
 			lib.groups[lib.group_count] = g;
 			lib.group_count++;
 		}
