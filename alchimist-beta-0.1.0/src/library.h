@@ -2,6 +2,7 @@
 #define LIBRARY_H
 
 #include <stdio.h>
+#include <string.h>
 
 typedef struct group{
 	char* name;
@@ -21,5 +22,7 @@ typedef struct library{
 	group* groups;
 	size_t group_count;
 }library;
+
+char* dualisation(library* lib, char* element1, char* element2);
 
 #endif

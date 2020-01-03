@@ -58,9 +58,9 @@ void draw(library* lib){
 	printf("you choose %s\n", twice);
 	system("clear");
 	printf("%s + %s = ", first, twice);
-	puts(rez = dualisation(lib, first, twice));
+	rez = dualisation(lib, first, twice);
 
-	if(!(dualisation(lib, first, twice))){
+	if(!(rez)){
 		puts("wrong combinate");
 		return;
 	}

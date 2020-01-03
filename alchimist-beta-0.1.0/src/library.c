@@ -1,4 +1,4 @@
-#include "game.h"
+#include "library.h"
 
 char* dualisation(library* lib, char* element1, char* element2){
 	int i;
