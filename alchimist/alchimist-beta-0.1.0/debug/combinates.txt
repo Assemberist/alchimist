@@ -1,5 +1,0 @@
-water+fire=flex
-water+air=myst
-air+fire=energy
-ground+water=gryaz
-ground+air=pil
