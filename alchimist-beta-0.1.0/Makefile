@@ -1,5 +1,5 @@
-all: main.o loader.o render.o library.o
-	gcc -o debug/alchimist obj/loader.o obj/render.o obj/main.o obj/library.o -g
+all: main.o loader.o render.o library.o int_check.o
+	gcc -o debug/alchimist obj/loader.o obj/render.o obj/main.o obj/library.o obj/int_check.o -g
 
 main.o: src/main.c
 	gcc -c src/main.c -o obj/main.o -g
@@ -11,4 +11,7 @@ render.o: src/render.c src/render.h
 	gcc -c src/render.c -o obj/render.o -g
 
 library.o: src/library.c src/library.h
-	gcc -c src/library.c -o obj/library.o
+	gcc -c src/library.c -o obj/library.o -g
+
+int_check.o: src/int_check.c src/int_check.h
+	gcc -c src/int_check.c -o obj/int_check.o -g

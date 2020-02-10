@@ -13,3 +13,14 @@ char* dualisation(library* lib, char* element1, char* element2){
 	return 0;
 }
 
+void dispose_library(library* lib){
+	int i = lib->group_count;
+	while(i--){
+		int j = lib->groups[i].name_count;
+		while(j--) free(lib->groups[i].names[j]);
+		free(lib->groups[i].names);
+		free(lib->groups[i].name);
+	}
+	free(lib->groups);
+	free(lib->recepts);
+}

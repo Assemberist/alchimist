@@ -1,5 +1,6 @@
 flex:0
 myst:0
+fire:1
 energy:0
 gryaz:0
 pil:0

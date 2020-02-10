@@ -1,9 +1,8 @@
 #include "loader.h"
 #include "render.h"
+#include "int_check.h"
 
 int main(){
-	library lib=load_library();
-	puts("yey");
-	draw(&lib);
+	check_library();
 	return 0;
 }

@@ -7,7 +7,6 @@
 #include <linux/limits.h>
 
 #include <string.h>
-#include <stdlib.h>
 
 library load_library();
 

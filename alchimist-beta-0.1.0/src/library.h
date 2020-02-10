@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct group{
 	char* name;
@@ -24,5 +25,6 @@ typedef struct library{
 }library;
 
 char* dualisation(library* lib, char* element1, char* element2);
+void dispose_library(library* lib);
 
 #endif
