@@ -12,7 +12,8 @@ typedef struct token{
 }token;
 
 token* init_tree();
-void add_word(char*, token*);
-void remove_tree(token*);
+void add_word(char* src, token* begin);
+char* find_word(char* src, token* begin);
+void remove_tree(token* begin);
 
 #endif

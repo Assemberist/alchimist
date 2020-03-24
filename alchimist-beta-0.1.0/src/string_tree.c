@@ -32,7 +32,10 @@ token* new_token(char* _token){
 
 size_t strdif(char* str1, char* str2){
 	size_t ret = 0;
-	while(*(str1++)==*(str2++)) ++ret;
+	while(*(str1++)==*(str2++)) {
+		++ret;
+		if(!*str1) return ret;
+	}
 	return ret;
 }
 
@@ -72,4 +75,26 @@ void add_word(char* src, token* begin){
 		ptr->tok = (char*)malloc(strlen(src+1));
 		strcpy(ptr->tok, src);
 	}
+}
+
+char* find_down(char* src, token* begin){
+	while(begin){
+		if(*begin->tok == *src){
+			size_t diff = strdif(begin->tok, src);
+
+			if(strlen(begin->tok) == strlen(src)) 
+				return begin->origin;
+
+			if(diff < strlen(src))
+				return find_down(src + diff, begin->down);
+
+			return 0;
+		}
+		else begin = begin->next;
+	}
+	return 0;
+}
+
+char* find_word(char* src, token* begin){
+	return find_down(src, begin + *src);
 }
