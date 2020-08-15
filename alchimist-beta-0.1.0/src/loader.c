@@ -1,17 +1,5 @@
 #include "loader.h"
 
-char* find_lexem(library* lib, char* buff){
-	size_t i, j;
-	for(i = lib->group_count; i--;)
-		for(j = lib->groups[i].name_count; j--;){
-			if(strstr(lib->groups[i].names[j], buff)) return lib->groups[i].names[j];
-			buff[0] ^= 1<<7;
-			if(strstr(lib->groups[i].names[j], buff)) return lib->groups[i].names[j];
-			buff[0] ^= 1<<7;
-		}
-	return 0;
-}
-
 char* get_lexem(FILE* file, char stop_sym){
 	char buff[64];
 	char* ptr = buff;
@@ -108,7 +96,7 @@ library load_groups(){
 	return lib;
 }
 
-library load_combinates(){
+library load_combinates(token* worterbuch){
 	library lib;
     lib.recepts = NULL;
 
@@ -146,17 +134,17 @@ library load_combinates(){
 		char* ptr = buff;
 		char* end = strchr(ptr, '+');
 		*end = '\0';
-        lib.recepts[lib.recept_count].reagent1 = find_lexem(&lib, ptr);
+        lib.recepts[lib.recept_count].reagent1 = find_word(ptr, worterbuch);
 
 		ptr = end + 1;
 		end = strchr(ptr, '=');
 		*end = '\0';
-        lib.recepts[lib.recept_count].reagent2 = find_lexem(&lib, ptr);
+        lib.recepts[lib.recept_count].reagent2 = find_word(ptr, worterbuch);
 
 		ptr = end + 1;
 		end = strchr(ptr, '\n');
 		*end = '\0';
-        lib.recepts[lib.recept_count].rezult = find_lexem(&lib, ptr);
+        lib.recepts[lib.recept_count].rezult = find_word(ptr, worterbuch);
 	}
 	fclose(reader);
 	return lib;
@@ -169,7 +157,20 @@ library load_library(){
 	lib.groups = groups.groups;
 	lib.group_count = groups.group_count;	
 
-	library combinates = load_combinates();
+	token* wortbook = init_tree();
+	int i, j;
+	for(i = lib.group_count; i--;){
+		for(j = lib.group_count[i].name_count; j--;){
+			if(lib.group_count[i].names[j][0] & 128){
+				lib.group_count[i].names[j][0] ^ 128;
+				add_word(lib.group_count[i].names[j], wortbook);
+				lib.group_count[i].names[j][0] ^ 128;
+			}
+			else add_word(lib.group_count[i].names[j], wortbook);
+		}
+	}
+
+	library combinates = load_combinates(wortbook);
 	lib.recepts = combinates.recepts;
 	lib.recept_count = combinates.recept_count;
 	
