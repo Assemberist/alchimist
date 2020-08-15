@@ -49,10 +49,9 @@ group parse_group(FILE* file){
 	return gr;
 }
 
-library load_library(){
+library load_groups(){
 	library lib;
 	lib.groups = NULL;
-    lib.recepts = NULL;
 	lib.group_count = 0;
 
 	FILE* reader;
@@ -105,11 +104,28 @@ library load_library(){
 	}
 	fclose(reader);
 	closedir(dir);
+	
+	return lib;
+}
 
+library load_combinates(){
+	library lib;
+    lib.recepts = NULL;
+
+	FILE* reader;
+	char path[PATH_MAX];
+	memset(path, 0, PATH_MAX);
+	if(readlink("/proc/self/exe", path, PATH_MAX) == -1){ 
+		puts("exe pos error");
+		return lib;
+	}
+	path[strlen(path)-9] = '\0';
+
+	char group_name[PATH_MAX];
 	strcpy(group_name, path);
 	strcat(group_name, "combinates.txt");
-
 	reader = fopen(group_name, "r");
+
 	char buff[200];
 
 	if(!reader){
@@ -143,5 +159,19 @@ library load_library(){
         lib.recepts[lib.recept_count].rezult = find_lexem(&lib, ptr);
 	}
 	fclose(reader);
+	return lib;
+}
+
+library load_library(){
+	library lib;
+
+	library groups = load_groups();
+	lib.groups = groups.groups;
+	lib.group_count = groups.group_count;	
+
+	library combinates = load_combinates();
+	lib.recepts = combinates.recepts;
+	lib.recept_count = combinates.recept_count;
+	
 	return lib;
 }
