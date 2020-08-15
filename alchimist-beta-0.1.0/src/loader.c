@@ -12,16 +12,6 @@ char* find_lexem(library* lib, char* buff){
 	return 0;
 }
 
-void read_lexem(FILE* file, char* buff, size_t buff_size, char stop_sym){
-	char sym;
-	while(buff_size--){
-		sym = fgetc(file);
-		if(sym == stop_sym || feof(file)) return;
-		*(buff++) = sym;
-	}
-	puts("buff end");
-}
-
 char* get_lexem(FILE* file, char stop_sym){
 	char buff[64];
 	char* ptr = buff;
@@ -59,10 +49,9 @@ group parse_group(FILE* file){
 	return gr;
 }
 
-library load_library(){
+library load_groups(){
 	library lib;
 	lib.groups = NULL;
-    lib.recepts = NULL;
 	lib.group_count = 0;
 
 	FILE* reader;
@@ -115,34 +104,74 @@ library load_library(){
 	}
 	fclose(reader);
 	closedir(dir);
+	
+	return lib;
+}
 
+library load_combinates(){
+	library lib;
+    lib.recepts = NULL;
+
+	FILE* reader;
+	char path[PATH_MAX];
+	memset(path, 0, PATH_MAX);
+	if(readlink("/proc/self/exe", path, PATH_MAX) == -1){ 
+		puts("exe pos error");
+		return lib;
+	}
+	path[strlen(path)-9] = '\0';
+
+	char group_name[PATH_MAX];
 	strcpy(group_name, path);
 	strcat(group_name, "combinates.txt");
-
 	reader = fopen(group_name, "r");
-	char buff[64];
+
+	char buff[200];
 
 	if(!reader){
 		puts("combinates.txt not open");
 		return lib;
 	}
 	size_t str_count = 0;
-	while(!feof(reader)) if(fgetc(reader) == '\n') str_count++;
+	while(!feof(reader)) {
+		fgets(buff, 200, reader);
+		str_count++;
+	}
 	rewind(reader);
 
 	lib.recepts = (combinate*)malloc(sizeof(combinate) * str_count);
 
-	for(lib.recept_count = 0; lib.recept_count < str_count; lib.recept_count++){
-		memset(buff, 0, 64);
-		read_lexem(reader, buff, 64, '+');
-        lib.recepts[lib.recept_count].reagent1 = find_lexem(&lib, buff);
-		memset(buff, 0, 64);
-		read_lexem(reader, buff, 64, '=');
-        lib.recepts[lib.recept_count].reagent2 = find_lexem(&lib, buff);
-		memset(buff, 0, 64);
-		read_lexem(reader, buff, 64, '\n');
-        lib.recepts[lib.recept_count].rezult = find_lexem(&lib, buff);
+	for(lib.recept_count = 0; lib.recept_count < str_count - 1; lib.recept_count++){
+		fgets(buff, 200, reader);
+		char* ptr = buff;
+		char* end = strchr(ptr, '+');
+		*end = '\0';
+        lib.recepts[lib.recept_count].reagent1 = find_lexem(&lib, ptr);
+
+		ptr = end + 1;
+		end = strchr(ptr, '=');
+		*end = '\0';
+        lib.recepts[lib.recept_count].reagent2 = find_lexem(&lib, ptr);
+
+		ptr = end + 1;
+		end = strchr(ptr, '\n');
+		*end = '\0';
+        lib.recepts[lib.recept_count].rezult = find_lexem(&lib, ptr);
 	}
 	fclose(reader);
+	return lib;
+}
+
+library load_library(){
+	library lib;
+
+	library groups = load_groups();
+	lib.groups = groups.groups;
+	lib.group_count = groups.group_count;	
+
+	library combinates = load_combinates();
+	lib.recepts = combinates.recepts;
+	lib.recept_count = combinates.recept_count;
+	
 	return lib;
 }
