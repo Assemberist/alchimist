@@ -1,4 +1,5 @@
 #include "loader.h"
+#include "string_tree.h"
 
 char* get_lexem(FILE* file, char stop_sym){
 	char buff[64];
@@ -160,13 +161,13 @@ library load_library(){
 	token* wortbook = init_tree();
 	int i, j;
 	for(i = lib.group_count; i--;){
-		for(j = lib.group_count[i].name_count; j--;){
-			if(lib.group_count[i].names[j][0] & 128){
-				lib.group_count[i].names[j][0] ^ 128;
-				add_word(lib.group_count[i].names[j], wortbook);
-				lib.group_count[i].names[j][0] ^ 128;
+		for(j = lib.groups[i].name_count; j--;){
+			if(lib.groups[i].names[j][0] & 128){
+				lib.groups[i].names[j][0] ^= 128;
+				add_word(lib.groups[i].names[j], wortbook);
+				lib.groups[i].names[j][0] ^= 128;
 			}
-			else add_word(lib.group_count[i].names[j], wortbook);
+			else add_word(lib.groups[i].names[j], wortbook);
 		}
 	}
 
@@ -174,5 +175,6 @@ library load_library(){
 	lib.recepts = combinates.recepts;
 	lib.recept_count = combinates.recept_count;
 	
+	remove_tree(wortbook);
 	return lib;
 }
