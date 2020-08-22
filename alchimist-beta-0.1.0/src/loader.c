@@ -2,15 +2,17 @@
 #include "string_tree.h"
 
 char* get_lexem(FILE* file, char stop_sym){
-	char buff[64];
-	char* ptr = buff;
 	if(feof(file)) return 0;
-	do *ptr=fgetc(file);
-	while(!feof(file) && *(ptr++) != stop_sym);
-	size_t len = ptr-buff-1;
-	ptr = (char*)malloc(len+1);
+
+	char buff[64];
+	fgets(buff, 64, file);
+	char* ptr = strchr(buff, stop_sym);
+	if(*(ptr+1) == '0') buff[0] |= 128;
+	*ptr = '\0';
+
+	size_t len = strlen(buff);
+	ptr = (char*)malloc(len);
 	strncpy(ptr, buff, len);
-	ptr[len] = '\0';
 	return ptr;
 }
 
@@ -27,12 +29,8 @@ group parse_group(FILE* file){
 
 	rewind(file);
 
-	while(gr.name_count < capasity)
-	{
+	while(gr.name_count < capasity){
 		gr.names[gr.name_count] = get_lexem(file, ':');
-		if(fgetc(file) == '0') gr.names[gr.name_count][0] += 128;
-		while(!feof(file))
-			if('\n' == fgetc(file)) break;
 		gr.name_count++;
 	}
 	return gr;
@@ -104,7 +102,7 @@ library load_combinates(token* worterbuch){
 	FILE* reader;
 	char path[PATH_MAX];
 	memset(path, 0, PATH_MAX);
-	if(readlink("/proc/self/exe", path, PATH_MAX) == -1){ 
+	if(readlink("/proc/self/exe", path, PATH_MAX) == -1){
 		puts("exe pos error");
 		return lib;
 	}
@@ -156,7 +154,7 @@ library load_library(){
 
 	library groups = load_groups();
 	lib.groups = groups.groups;
-	lib.group_count = groups.group_count;	
+	lib.group_count = groups.group_count;
 
 	token* wortbook = init_tree();
 	int i, j;
@@ -174,7 +172,7 @@ library load_library(){
 	library combinates = load_combinates(wortbook);
 	lib.recepts = combinates.recepts;
 	lib.recept_count = combinates.recept_count;
-	
+
 	remove_tree(wortbook);
 	return lib;
 }
