@@ -67,11 +67,11 @@ token* slide_down(char* src, token* begin){
 	return begin->next;
 }
 
-void add_word(char* src, token* begin){
+void add_element(char* src, void* element, token* begin){
 	token* ptr = begin + *src;
-	if(ptr->tok) slide_down(src, ptr)->origin = src;
+	if(ptr->tok) slide_down(src, ptr)->origin = element;
 	else{
-		ptr->origin = src;
+		ptr->origin = element;
 		ptr->tok = (char*)malloc(strlen(src+1));
 		strcpy(ptr->tok, src);
 	}
@@ -95,6 +95,6 @@ char* find_down(char* src, token* begin){
 	return 0;
 }
 
-char* find_word(char* src, token* begin){
+void* find_element(char* src, token* begin){
 	return find_down(src, begin + *src);
 }
