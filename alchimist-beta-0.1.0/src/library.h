@@ -4,17 +4,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+
+typedef struct element{
+	char* value;
+	int32_t is_open:1;
+}element;
 
 typedef struct group{
 	char* name;
-	char** names;
+	element* names;
 	size_t name_count;
 }group;
 
 typedef struct combinate{
-	char* reagent1;
-	char* reagent2;
-	char* rezult;
+	element* reagent1;
+	element* reagent2;
+	element* rezult;
 }combinate;
 
 typedef struct library{
