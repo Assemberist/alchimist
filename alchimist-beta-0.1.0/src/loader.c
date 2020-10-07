@@ -1,21 +1,19 @@
 #include "loader.h"
 #include "string_tree.h"
 
-element get_element(FILE* file, char stop_sym){
-	if(feof(file)) return (element){0,0};
+char* get_lexem(FILE* file, char stop_sym){
+	if(feof(file)) return 0;
 
 	char buff[64];
 	fgets(buff, 64, file);
-
-	element el;
 	char* ptr = strchr(buff, stop_sym);
-	el.is_open = (*(ptr+1) == '0' ? 0 : 1);
-
+	if(*(ptr+1) == '0') buff[0] |= 128;
 	*ptr = '\0';
+
 	size_t len = strlen(buff);
-	el.value = (char*)malloc(len);
+	ptr = (char*)malloc(len);
 	strncpy(ptr, buff, len);
-	return el;
+	return ptr;
 }
 
 group parse_group(FILE* file){
@@ -27,12 +25,12 @@ group parse_group(FILE* file){
 	memset(buff, 0, 64);
 
 	while(fgets(buff, 64, file)) capasity++;
-	gr.names = (element*)malloc(capasity * sizeof(element));
+	gr.names = (char**)malloc(capasity * sizeof(char*));
 
 	rewind(file);
 
 	while(gr.name_count < capasity){
-		gr.names[gr.name_count] = get_element(file, ':');
+		gr.names[gr.name_count] = get_lexem(file, ':');
 		gr.name_count++;
 	}
 	return gr;
