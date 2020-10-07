@@ -8,6 +8,6 @@
 
 #include <string.h>
 
-library load_library();
+library load_library(char* path);
 
 #endif

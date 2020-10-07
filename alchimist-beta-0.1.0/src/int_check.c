@@ -8,7 +8,7 @@ void again_elements(library lib);
 void again_combinate(library lib);
 
 void check_library(){
-	library lib = load_library();
+	library lib = load_library("/home/sanya/Рабочий стол/sources/alchimist/alchimist-beta-0.1.0/debug");
 	if(missing(lib)) {
 		puts("this is critical!");
 		puts("check abort");

@@ -4,7 +4,7 @@
 #include "string_tree.h"
 
 int main(){
-	library lib = load_library();
+	library lib = load_library("/home/sanya/Рабочий стол/sources/alchimist/alchimist-beta-0.1.0/debug");
 
 	int i;
 	for(i = lib.recept_count; i--;){
