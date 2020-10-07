@@ -1,4 +1,7 @@
-all: main.o loader.o render.o library.o int_check.o string_tree.o
+all: main.o loader.o render.o library.o string_tree.o
+	gcc -o debug/alchimist obj/loader.o obj/render.o obj/main.o obj/library.o obj/string_tree.o -g
+
+tests: main.o loader.o render.o library.o int_check.o string_tree.o
 	gcc -o debug/alchimist obj/loader.o obj/render.o obj/main.o obj/library.o obj/int_check.o obj/string_tree.o -g
 
 main.o: src/main.c
