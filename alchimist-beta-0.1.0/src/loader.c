@@ -38,34 +38,25 @@ group parse_group(FILE* file){
 	return gr;
 }
 
-library load_groups(){
+library load_groups(char* path){
 	library lib;
 	lib.groups = NULL;
 	lib.group_count = 0;
 
 	FILE* reader;
 
-	char path[PATH_MAX];
-	memset(path, 0, PATH_MAX);
-	if(readlink("/proc/self/exe", path, PATH_MAX) == -1){ 
-		puts("exe pos error");
-		return lib;
-	}
-	path[strlen(path)-9] = '\0';
-
 	char group_name[PATH_MAX];
-	strcpy(group_name, path);
-	strcat(group_name, "groups");
+    sprintf(group_name, "%s%s", path, "/groups");
 
 	DIR* dir;
 	if((dir = opendir(group_name)) == NULL){
 		puts("dir reading error");
 		return lib;
 	}
-	struct dirent* f_cur;
 
 	size_t file_count = 0;
-	while((f_cur = readdir(dir)) != NULL) file_count++;
+	struct dirent* f_cur;
+	while(f_cur = readdir(dir)) file_count++;
 	file_count-=2;
 
 	rewinddir(dir);
@@ -74,10 +65,9 @@ library load_groups(){
 
 	while(lib.group_count < file_count){
 		f_cur = readdir(dir);
-		if(f_cur->d_name[0] != '.'){
-			strcpy(group_name, path);
-			strcat(group_name, "groups/");
-			strcat(group_name, f_cur->d_name);
+        char* file_name = f_cur->d_name;
+		if(file_name[0] != '.'){
+            sprintf(group_name, "%s%s%s", path, "/groups/", file_name);
 			group g;
 			reader = fopen(group_name, "r");
 			if(!reader){
@@ -85,8 +75,8 @@ library load_groups(){
 				return lib;
 			}
 			g = parse_group(reader);
-			g.name = (char*)malloc(strlen(f_cur->d_name) - 4);
-			strncpy(g.name, f_cur->d_name, strlen(f_cur->d_name) - 4);
+			g.name = (char*)malloc(strlen(file_name) - 4);
+			strncpy(g.name, file_name, strlen(file_name) - 4);
 			lib.groups[lib.group_count] = g;
 			lib.group_count++;
 		}
@@ -97,30 +87,21 @@ library load_groups(){
 	return lib;
 }
 
-library load_combinates(token* worterbuch){
+library load_combinates(token* worterbuch, char* path){
 	library lib;
     lib.recepts = NULL;
 
-	FILE* reader;
-	char path[PATH_MAX];
-	memset(path, 0, PATH_MAX);
-	if(readlink("/proc/self/exe", path, PATH_MAX) == -1){
-		puts("exe pos error");
-		return lib;
-	}
-	path[strlen(path)-9] = '\0';
-
 	char group_name[PATH_MAX];
-	strcpy(group_name, path);
-	strcat(group_name, "combinates.txt");
-	reader = fopen(group_name, "r");
+	sprintf(group_name, "%s%s", path, "/combinates.txt");
 
 	char buff[200];
 
+	FILE* reader = fopen(group_name, "r");
 	if(!reader){
 		puts("combinates.txt not open");
 		return lib;
 	}
+
 	size_t str_count = 0;
 	while(!feof(reader)) {
 		fgets(buff, 200, reader);
@@ -151,10 +132,10 @@ library load_combinates(token* worterbuch){
 	return lib;
 }
 
-library load_library(){
+library load_library(char* path){
 	library lib;
 
-	library groups = load_groups();
+	library groups = load_groups(path);
 	lib.groups = groups.groups;
 	lib.group_count = groups.group_count;
 
@@ -171,7 +152,7 @@ library load_library(){
 		}
 	}
 
-	library combinates = load_combinates(wortbook);
+	library combinates = load_combinates(wortbook, path);
 	lib.recepts = combinates.recepts;
 	lib.recept_count = combinates.recept_count;
 
