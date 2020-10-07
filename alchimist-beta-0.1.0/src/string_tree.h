@@ -6,14 +6,14 @@
 
 typedef struct token{
 	char* tok;
-	void* origin;
+	char* origin;
 	struct token* next;
 	struct token* down; 
 }token;
 
 token* init_tree();
-void add_element(char* src, void* element, token* begin);
-void* find_element(char* src, token* begin);
+void add_word(char* src, token* begin);
+char* find_word(char* src, token* begin);
 void remove_tree(token* begin);
 
 #endif
