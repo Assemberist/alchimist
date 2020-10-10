@@ -1,19 +1,20 @@
 #include "loader.h"
 #include "string_tree.h"
 
-char* get_lexem(FILE* file, char stop_sym){
-	if(feof(file)) return 0;
+element get_lexem(FILE* file, char stop_sym){
+	element el;
+	if(feof(file)) return (element){0,0};
 
 	char buff[64];
 	fgets(buff, 64, file);
 	char* ptr = strchr(buff, stop_sym);
-	if(*(ptr+1) == '0') buff[0] |= 128;
 	*ptr = '\0';
 
-	size_t len = strlen(buff);
-	ptr = (char*)malloc(len);
-	strncpy(ptr, buff, len);
-	return ptr;
+	size_t len = ptr - buff;
+	el.is_open = (ptr[1] == '0' ? 0 : 1);
+	el.value = (char*)malloc(len);
+	strncpy(el.value, buff, len);
+	return el;
 }
 
 group parse_group(FILE* file){
@@ -25,7 +26,7 @@ group parse_group(FILE* file){
 	memset(buff, 0, 64);
 
 	while(fgets(buff, 64, file)) capasity++;
-	gr.names = (char**)malloc(capasity * sizeof(char*));
+	gr.names = (element*)malloc(capasity * sizeof(element));
 
 	rewind(file);
 
@@ -114,17 +115,17 @@ library load_combinates(token* worterbuch, char* path){
 		char* ptr = buff;
 		char* end = strchr(ptr, '+');
 		*end = '\0';
-        lib.recepts[lib.recept_count].reagent1 = find_word(ptr, worterbuch);
+        lib.recepts[lib.recept_count].reagent1 = find_element(ptr, worterbuch);
 
 		ptr = end + 1;
 		end = strchr(ptr, '=');
 		*end = '\0';
-        lib.recepts[lib.recept_count].reagent2 = find_word(ptr, worterbuch);
+        lib.recepts[lib.recept_count].reagent2 = find_element(ptr, worterbuch);
 
 		ptr = end + 1;
 		end = strchr(ptr, '\n');
 		*end = '\0';
-        lib.recepts[lib.recept_count].rezult = find_word(ptr, worterbuch);
+        lib.recepts[lib.recept_count].rezult = find_element(ptr, worterbuch);
 	}
 	fclose(reader);
 	return lib;
@@ -139,16 +140,9 @@ library load_library(char* path){
 
 	token* wortbook = init_tree();
 	int i, j;
-	for(i = lib.group_count; i--;){
-		for(j = lib.groups[i].name_count; j--;){
-			if(lib.groups[i].names[j][0] & 128){
-				lib.groups[i].names[j][0] ^= 128;
-				add_word(lib.groups[i].names[j], wortbook);
-				lib.groups[i].names[j][0] ^= 128;
-			}
-			else add_word(lib.groups[i].names[j], wortbook);
-		}
-	}
+	for(i = lib.group_count; i--;)
+		for(j = lib.groups[i].name_count; j--;)
+			add_element(lib.groups[i].names[j].value, lib.groups[i].names + j, wortbook);
 
 	library combinates = load_combinates(wortbook, path);
 	lib.recepts = combinates.recepts;

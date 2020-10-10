@@ -4,7 +4,7 @@
 
 #ifdef CONSOLE
 
-char* choose_element(library* lib){
+element* choose_element(library* lib){
 	size_t i, j;
 	char buff[64];
 
@@ -22,32 +22,30 @@ char* choose_element(library* lib){
 		return 0;
 	}
 
-	puts(buff);
+	puts(lib->groups[i].name);
 
 	puts("choose element");
 	for(j = 0; j < lib->groups[i].name_count; j++) 
-		if(!(lib->groups[i].names[j][0] & 1<<7))
-			printf("%i) %s\n", j+1, lib->groups[i].names[j]);
+		if(lib->groups[i].names[j].is_open)
+			printf("%i) %s\n", j+1, lib->groups[i].names[j].value);
 	
 	gets(buff);
 	for(j = lib->groups[i].name_count; j--;)
-		if(strstr(lib->groups[i].names[j], buff)) break;
+		if(lib->groups[i].names[j].is_open)
+			if(strstr(lib->groups[i].names[j].value, buff)) return lib->groups[i].names + j;
 	
-	if(j == -1) return 0;
-
-	return lib->groups[i].names[j];
+	return 0;
 }
 
 void draw(library* lib){
-	char *first, *twice, *rez;
+	element *first, *twice, *rez;
 	
-	system("clear");
 	puts("first element");
 	if(!(first = choose_element(lib))){
 		puts("wrong name");
 		return;
 	}
-	printf("you chhose %s\n", first);
+	printf("you chhose %s\n", first->value);
 
 	puts("twise element");
 	if(!(twice = choose_element(lib))){
@@ -55,17 +53,12 @@ void draw(library* lib){
 		return;
 	}
 
-	printf("you choose %s\n", twice);
+	printf("you choose %s\n", twice->value);
 	system("clear");
-	printf("%s + %s = ", first, twice);
+	printf("%s + %s = ", first->value, twice->value);
+
 	rez = dualisation(lib, first, twice);
-
-	if(!(rez)){
-		puts("wrong combinate");
-		return;
-	}
-	printf("you get %s\n", rez);
-
+	rez ? printf("you get %s\n", rez->value) : puts("wrong combinate");	
 }
 
 #endif
