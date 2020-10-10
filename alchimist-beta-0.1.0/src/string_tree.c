@@ -67,10 +67,6 @@ token* slide_down(char* src, token* begin){
 	return begin->next;
 }
 
-void add_word(char* src, token* begin){
-	add_element(src, src, begin);
-}
-
 void add_element(char* src, void* element, token* begin){
 	token* ptr = begin + *src;
 	if(ptr->tok) slide_down(src, ptr)->origin = element;
@@ -81,7 +77,7 @@ void add_element(char* src, void* element, token* begin){
 	}
 }
 
-char* find_down(char* src, token* begin){
+void* find_down(char* src, token* begin){
 	while(begin){
 		if(*begin->tok == *src){
 			size_t diff = strdif(begin->tok, src);
@@ -101,8 +97,4 @@ char* find_down(char* src, token* begin){
 
 void* find_element(char* src, token* begin){
 	return find_down(src, begin + *src);
-}
-
-char* find_word(char* src, token* begin){
-	return (char*)find_element(src, begin);
 }
