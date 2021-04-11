@@ -8,7 +8,7 @@ void again_elements(library lib);
 void again_combinate(library lib);
 
 void check_library(){
-	library lib = load_library("/home/sanya/Рабочий стол/sources/alchimist/alchimist-beta-0.1.0/debug");
+	library lib = load_library("/home/sanya/source/alchimist/alchimist-beta-0.1.0/debug");
 	if(missing(lib)) {
 		puts("this is critical!");
 		puts("check abort");
@@ -29,15 +29,15 @@ void check_library(){
 }
 
 void find_element_in_andere_groups(library lib, int group_num, int name_num){
-	char* src = lib.groups[group_num].names[name_num];
+	char* src = lib.groups[group_num].names[name_num].value;
 	int i = group_num;
 	while(i-- > 0){
 		int j = lib.groups[i].name_count;
 		while(j-- > 0){
-			if(!strcmp(lib.groups[i].names[j], src)){
+			if(!strcmp(lib.groups[i].names[j].value, src)){
 				printf(
 					"multiple input element: %s in group %s and group %s\n",
-					lib.groups[i].names[j],
+					lib.groups[i].names[j].value,
 					lib.groups[group_num].name,
 					lib.groups[i].name
 				);
@@ -52,7 +52,7 @@ void open_elements(library lib){
 	while(i--){
 		int j = lib.groups[i].name_count;
 		while(j-- > 1){
-			lib.groups[i].names[j][0] &= 127;
+			lib.groups[i].names[j].value[0] &= 127;
 		}
 	}
 }
@@ -65,10 +65,10 @@ void again_elements(library lib){
 		while(j-- > 0){
 			int k = j;
 			while(k-- > 0){
-				if(!strcmp(lib.groups[i].names[j], lib.groups[i].names[k])){
+				if(!strcmp(lib.groups[i].names[j].value, lib.groups[i].names[k].value)){
 					printf(
 						"multiple input element: %s in group %s and group %s\n",
-						lib.groups[i].names[j],
+						lib.groups[i].names[j].value,
 						lib.groups[i].name,
 						lib.groups[i].name
 					);
@@ -92,7 +92,7 @@ void again_combinate(library lib){
 				(lib.recepts[i].reagent1 == lib.recepts[j].reagent2 &&
 				lib.recepts[i].reagent2 == lib.recepts[j].reagent1)
 			) {
-				printf("has collision for combination: %s + %s\n", lib.recepts[i].reagent1, lib.recepts[i].reagent2);
+				printf("has collision for combination: %s + %s\n", lib.recepts[i].reagent1->value, lib.recepts[i].reagent2->value);
 				goto nextcom;
 			}
 		}
@@ -107,14 +107,15 @@ void unused(library lib){
 		while(j--){
 			int s = lib.recept_count;
 			while(s--){
-				if(lib.groups[i].names[j] == lib.recepts[s].reagent1) goto nextname;
-				if(lib.groups[i].names[j] == lib.recepts[s].reagent2) goto nextname;
-				if(lib.groups[i].names[j] == lib.recepts[s].rezult) goto nextname;
+				char* value = lib.groups[i].names[j].value;
+				if(value == lib.recepts[s].reagent1->value) goto nextname;
+				if(value == lib.recepts[s].reagent2->value) goto nextname;
+				if(value == lib.recepts[s].rezult->value) goto nextname;
 			}
-			char ch = lib.groups[i].names[j][0] & 128;
-			lib.groups[i].names[j][0] &= 127;
-			printf("unusing element %s in group %s\n", lib.groups[i].names[j], lib.groups[i].name);
-			lib.groups[i].names[j][0] |= ch;
+			char ch = lib.groups[i].names[j].value[0] & 128;
+			lib.groups[i].names[j].value[0] &= 127;
+			printf("unusing element %s in group %s\n", lib.groups[i].names[j].value, lib.groups[i].name);
+			lib.groups[i].names[j].value[0] |= ch;
 			nextname: continue;
 		}
 	}
@@ -127,27 +128,27 @@ int missing(library lib){
 		if(lib.recepts[i].reagent1 && lib.recepts[i].reagent2 && lib.recepts[i].rezult) continue;
 
 		int reagents[3] = {0,0,0};
-		if(lib.recepts[i].reagent1 && lib.recepts[i].reagent1[0] & 128) { 
-			lib.recepts[i].reagent1[0] ^= 128;
+		if(lib.recepts[i].reagent1 && lib.recepts[i].reagent1->value[0] & 128) { 
+			lib.recepts[i].reagent1->value[0] ^= 128;
 			reagents[0] = 1;
 		}
-		if(lib.recepts[i].reagent2 && lib.recepts[i].reagent2[0] & 128) {
-			lib.recepts[i].reagent2[0] ^= 128;
+		if(lib.recepts[i].reagent2 && lib.recepts[i].reagent2->value[0] & 128) {
+			lib.recepts[i].reagent2->value[0] ^= 128;
 			reagents[1] = 1;
 		}
-		if(lib.recepts[i].rezult && lib.recepts[i].rezult[0] & 128) {
-			lib.recepts[i].rezult[0] ^= 128;
+		if(lib.recepts[i].rezult && lib.recepts[i].rezult->value[0] & 128) {
+			lib.recepts[i].rezult->value[0] ^= 128;
 			reagents[2] = 1;
 		}
 		printf(
 			"breaked combinate: %s + %s = %s\n",
-			(lib.recepts[i].reagent1 ? lib.recepts[i].reagent1 : "???"),
-			(lib.recepts[i].reagent2 ? lib.recepts[i].reagent2 : "???"),
-			(lib.recepts[i].rezult ? lib.recepts[i].rezult : "???")
+			(lib.recepts[i].reagent1 ? lib.recepts[i].reagent1->value : "???"),
+			(lib.recepts[i].reagent2 ? lib.recepts[i].reagent2->value : "???"),
+			(lib.recepts[i].rezult ? lib.recepts[i].rezult->value : "???")
 		);
-		if(reagents[0]) lib.recepts[i].reagent1[0] ^= 128;
-		if(reagents[0]) lib.recepts[i].reagent2[0] ^= 128;
-		if(reagents[0]) lib.recepts[i].rezult[0] ^= 128;
+		if(reagents[0]) lib.recepts[i].reagent1->value[0] ^= 128;
+		if(reagents[0]) lib.recepts[i].reagent2->value[0] ^= 128;
+		if(reagents[0]) lib.recepts[i].rezult->value[0] ^= 128;
 		counter++;
 	}
 	return counter;
@@ -159,12 +160,12 @@ void undiscovered(library lib){
 	while(i--){
 		int j = lib.groups[i].name_count;
 		while(j--){
-			if(!(lib.groups[i].names[j][0] & 128)) continue;
+			if(!(lib.groups[i].names[j].value[0] & 128)) continue;
 			int s = lib.recept_count;
-			while(s--) if(lib.groups[i].names[j] == lib.recepts[s].rezult) goto nextname;
-			lib.groups[i].names[j][0] ^= 128;
-			printf("undiscowered element %s in group %s\n", lib.groups[i].names[j], lib.groups[i].name);
-			lib.groups[i].names[j][0] ^= 128;
+			while(s--) if(lib.groups[i].names[j].value == lib.recepts[s].rezult->value) goto nextname;
+			lib.groups[i].names[j].value[0] ^= 128;
+			printf("undiscowered element %s in group %s\n", lib.groups[i].names[j].value, lib.groups[i].name);
+			lib.groups[i].names[j].value[0] ^= 128;
 			nextname: continue;
 		}
 	}
@@ -177,9 +178,9 @@ void unget(library lib){
 	
 	for(i=0; i <= last; i++){
 		if(!(
-			lib.recepts[i].reagent1[0] & 128 ||
-			lib.recepts[i].reagent2[0] & 128 ||
-			lib.recepts[i].rezult[0] & 128
+			lib.recepts[i].reagent1->value[0] & 128 ||
+			lib.recepts[i].reagent2->value[0] & 128 ||
+			lib.recepts[i].rezult->value[0] & 128
 		)) {
 			combinate com = lib.recepts[i];
 			lib.recepts[i] = lib.recepts[last];
@@ -193,10 +194,10 @@ void unget(library lib){
 		disc = 0;
 		for(i=0; i <= last; i++){
 			if(!(
-				lib.recepts[i].reagent1[0] & 128 ||
-				lib.recepts[i].reagent2[0] & 128 
+				lib.recepts[i].reagent1->value[0] & 128 ||
+				lib.recepts[i].reagent2->value[0] & 128 
 			)) {
-				lib.recepts[i].rezult[0] &= 127;
+				lib.recepts[i].rezult->value[0] &= 127;
 				combinate com = lib.recepts[i];
 				lib.recepts[i] = lib.recepts[last];
 				lib.recepts[last] = com;
@@ -209,14 +210,14 @@ void unget(library lib){
 
 	if(last >= 0){
 		for(i=0; i<last+1; i++){
-			lib.recepts[i].reagent1[0] &= 127;
-			lib.recepts[i].reagent2[0] &= 127;
-			lib.recepts[i].rezult[0] &= 127;
+			lib.recepts[i].reagent1->value[0] &= 127;
+			lib.recepts[i].reagent2->value[0] &= 127;
+			lib.recepts[i].rezult->value[0] &= 127;
 			printf(
 				"asimptote combinate: %s + %s = %s\n",
-				lib.recepts[i].reagent1,
-				lib.recepts[i].reagent2,
-				lib.recepts[i].rezult
+				lib.recepts[i].reagent1->value,
+				lib.recepts[i].reagent2->value,
+				lib.recepts[i].rezult->value
 			);
 		}
 	}

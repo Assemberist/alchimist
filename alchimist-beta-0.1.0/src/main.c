@@ -4,9 +4,9 @@
 #include "string_tree.h"
 
 int main(){
-	library lib = load_library("/home/sanya/Рабочий стол/sources/alchimist/alchimist-beta-0.1.0/debug");
-
+	library lib = load_library("/home/sanya/source/alchimist/alchimist-beta-0.1.0/debug");
+	check_library();
 	draw(&lib);
-
+	dispose_library(&lib);
 	return 0;
 }
