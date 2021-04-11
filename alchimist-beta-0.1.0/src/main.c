@@ -6,7 +6,7 @@
 int main(){
 	library lib = load_library("/home/sanya/Рабочий стол/sources/alchimist/alchimist-beta-0.1.0/debug");
 
-	while(1) draw(&lib);
+	draw(&lib);
 
 	return 0;
 }

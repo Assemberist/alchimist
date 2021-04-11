@@ -12,13 +12,14 @@ void remove_rec(token* begin){
 }
 
 void remove_tree(token* begin){
-	size_t len = 128;
+	size_t len = 256;
 	while(len--) remove_rec(begin + len);
+	free(begin);
 }
 
 token* init_tree(){
-	token* ptr = (token*)malloc(sizeof(token)<<7);
-	memset(ptr, 0, sizeof(token)<<7);
+	token* ptr = (token*)malloc(sizeof(token)<<8);
+	memset(ptr, 0, sizeof(token)<<8);
 	return ptr;
 }
 
