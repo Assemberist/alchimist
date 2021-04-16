@@ -26,6 +26,7 @@ token* init_tree(){
 token* new_token(char* _token){
 	token* ret = (token*)malloc(sizeof(token));
 	memset(ret, 0, sizeof(token));
+	if(!_token) return ret;
 	ret->tok = (char*)malloc(strlen(_token)+1);
 	strcpy(ret->tok, _token);
 	return ret;
@@ -42,27 +43,31 @@ size_t strdif(char* str1, char* str2){
 
 token* slide_down(char* src, token* begin){
 	char syn;
-	goto enter;
+	
+	if(strlen(src)){
+		goto enter;
 
-	do{
-		begin = begin->next;
-	
-		enter:
-	
-		if(syn = strdif(begin->tok, src)){
-			if(syn < strlen(begin->tok)){
-				token* ptr = new_token(begin->tok + syn);
-				ptr->origin = begin->origin;
-				begin->origin = 0;
-				ptr->down = begin->down;
-				begin->tok[syn] = 0;
-				begin->down = ptr;
+		do{
+			begin = begin->next;
+		
+			enter:
+		
+			if(syn = strdif(begin->tok, src)){
+				if(syn < strlen(begin->tok)){
+					token* ptr = new_token(begin->tok + syn);
+					ptr->origin = begin->origin;
+					begin->origin = 0;
+					ptr->down = begin->down;
+					begin->tok[syn] = 0;
+					begin->down = ptr;
+				}
+				if(syn < strlen(src)) 
+					return begin->down ? slide_down(src + syn, begin->down) : (begin->down = new_token(src + syn));
+				return begin;
 			}
-			if(syn < strlen(src)) 
-				return begin->down ? slide_down(src + syn, begin->down) : (begin->down = new_token(src + syn));
-			return begin;
-		}
-	}while(begin->next);
+		} while(begin->next);
+	}
+	else while(begin->next) begin = begin->next;
 
 	begin->next = new_token(src);
 	return begin->next;
