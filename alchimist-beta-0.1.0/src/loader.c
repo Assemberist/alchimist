@@ -1,22 +1,6 @@
 #include "loader.h"
 #include "string_tree.h"
 
-element get_lexem(FILE* file, char stop_sym){
-	element el;
-	if(feof(file)) return (element){0,0};
-
-	char buff[64];
-	fgets(buff, 64, file);
-	char* ptr = strchr(buff, stop_sym);
-	*ptr = '\0';
-
-	size_t len = ptr - buff;
-	el.is_open = (ptr[1] == '0' ? 0 : 1);
-	el.value = (char*)malloc(len);
-	strncpy(el.value, buff, len);
-	return el;
-}
-
 group parse_group(FILE* file){
 	group gr;
 	gr.name_count = 0;
@@ -27,11 +11,18 @@ group parse_group(FILE* file){
 
 	while(fgets(buff, 64, file)) capasity++;
 	gr.names = (element*)malloc(capasity * sizeof(element));
+	memset(gr.names, 0, capasity * sizeof(element));
 
 	rewind(file);
 
 	while(gr.name_count < capasity){
-		gr.names[gr.name_count] = get_lexem(file, ':');
+		fgets(buff, 64, file);
+		char* ptr = strtok(buff, ":");
+
+		gr.names[gr.name_count].value = (char*)malloc(strlen(buff)+1);
+		strcpy(gr.names[gr.name_count].value, buff);
+		gr.names[gr.name_count].is_open = (*strtok(NULL, "") == '0' ? 0 : 1);
+
 		gr.name_count++;
 	}
 	return gr;
@@ -112,19 +103,13 @@ library load_combinates(token* worterbuch, char* path){
 
 	for(lib.recept_count = 0; lib.recept_count < str_count - 1; lib.recept_count++){
 		fgets(buff, 200, reader);
-		char* ptr = buff;
-		char* end = strchr(ptr, '+');
-		*end = '\0';
+		char* ptr = strtok(buff, "+");
         lib.recepts[lib.recept_count].reagent1 = find_element(ptr, worterbuch);
 
-		ptr = end + 1;
-		end = strchr(ptr, '=');
-		*end = '\0';
+		ptr = strtok(NULL, "=");
         lib.recepts[lib.recept_count].reagent2 = find_element(ptr, worterbuch);
 
-		ptr = end + 1;
-		end = strchr(ptr, '\n');
-		*end = '\0';
+		ptr = strtok(NULL, "\n");
         lib.recepts[lib.recept_count].rezult = find_element(ptr, worterbuch);
 	}
 	fclose(reader);

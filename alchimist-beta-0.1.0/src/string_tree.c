@@ -73,7 +73,7 @@ void add_element(char* src, void* element, token* begin){
 	if(ptr->tok) slide_down(src, ptr)->origin = element;
 	else{
 		ptr->origin = element;
-		ptr->tok = (char*)malloc(strlen(src+1));
+		ptr->tok = (char*)malloc(strlen(src)+1);
 		strcpy(ptr->tok, src);
 	}
 }
