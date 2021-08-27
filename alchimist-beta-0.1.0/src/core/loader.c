@@ -1,5 +1,5 @@
-#include "loader.h"
-#include "string_tree.h"
+#include "../core/loader.h"
+#include "../service/string_tree.h"
 
 group parse_group(FILE* file){
 	group gr;
@@ -122,7 +122,7 @@ library load_library(char* path){
 	int i, j;
 	for(i = lib.group_count; i--;)
 		for(j = lib.groups[i].name_count; j--;)
-			add_element(get_el_name(lib.groups[i].names[j]), lib.groups[i].names + j, wortbook);
+			add_element(get_el_name(lib.groups[i].names + j), lib.groups[i].names + j, wortbook);
 
 	library combinates = load_combinates(wortbook, path);
 	lib.recepts = combinates.recepts;

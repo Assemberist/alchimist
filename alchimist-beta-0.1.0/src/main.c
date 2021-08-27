@@ -1,15 +1,14 @@
-#include "loader.h"
-#include "render.h"
+#include "core/loader.h"
 //#include "int_check.h"
-#include "string_tree.h"
+#include "service/string_tree.h"
 
 int main(){
-	library lib = load_library("./debug");
+	library lib = load_library(".");
 	//check_library();
 	//draw(&lib);
 	for(size_t i = lib.group_count; i--;){
 		for(size_t j = lib.groups[i].name_count; j--;)
-			puts(lib.groups[i].names[j].value);
+			puts(get_el_name(lib.groups[i].names + j));
 		puts("");
 	}
 

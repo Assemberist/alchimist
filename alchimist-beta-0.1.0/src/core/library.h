@@ -14,7 +14,7 @@ typedef union element{
 		uint8_t is_long:1;		
 	} longName;
 	struct{
-		char name[sizeof(char*) * 2 - 1];]
+		char name[sizeof(char*) * 2 - 1];
 		uint8_t is_open:1;
 		uint8_t is_long:1;
 	} shortName;
