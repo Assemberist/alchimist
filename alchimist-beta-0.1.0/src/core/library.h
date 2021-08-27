@@ -6,10 +6,21 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef struct element{
-	char* value;
-	uint32_t is_open:1;
+typedef union element{
+	struct{
+		char* name;
+		char _pad[sizeof(char*) - 1];
+		uint8_t is_open:1;
+		uint8_t is_long:1;		
+	} longName;
+	struct{
+		char name[sizeof(char*) * 2 - 1];]
+		uint8_t is_open:1;
+		uint8_t is_long:1;
+	} shortName;
 }element;
+
+element create_element(char* src);
 
 typedef struct group{
 	char* name;

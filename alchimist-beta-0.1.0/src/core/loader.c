@@ -17,11 +17,7 @@ group parse_group(FILE* file){
 
 	while(gr.name_count < capasity){
 		fgets(buff, 64, file);
-		char* ptr = strtok(buff, ":");
-
-		gr.names[gr.name_count].value = (char*)malloc(strlen(buff)+1);
-		strcpy(gr.names[gr.name_count].value, buff);
-		gr.names[gr.name_count].is_open = (*strtok(NULL, "") == '0' ? 0 : 1);
+		gr.names[gr.name_count] = create_element(char* src);
 
 		gr.name_count++;
 	}

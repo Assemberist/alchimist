@@ -23,3 +23,19 @@ void dispose_library(library* lib){
 	free(lib->groups);
 	free(lib->recepts);
 }
+
+element create_element(char* src){
+	element el;
+
+	char* ptr = strtok(buff, ":");
+
+	if(el.shortName.is_long = strlen(src) >= sizeof(char*) * 2 - 1)
+		strcpy(el.shortName.name, buff);
+	else {
+		el.longName.name = (char*)malloc(strlen(buff)+1);
+		strcpy(el.longName.name, buff);
+	}
+	el.shortName.is_open = (*strtok(NULL, "") == '0' ? 0 : 1);
+	
+	return el;
+}
