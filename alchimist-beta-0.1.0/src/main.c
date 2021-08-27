@@ -14,7 +14,7 @@ int main(){
 	}
 
 	for(size_t i = lib.recept_count; i--;)
-		printf("%s + %s = %s\n", lib.recepts[i].reagent1->value, lib.recepts[i].reagent2->value, lib.recepts[i].rezult->value);
+		printf("%s + %s = %s\n", get_el_name(lib.recepts[i].reagent1), get_el_name(lib.recepts[i].reagent2), get_el_name(lib.recepts[i].rezult));
 
 	dispose_library(&lib);
 	return 0;

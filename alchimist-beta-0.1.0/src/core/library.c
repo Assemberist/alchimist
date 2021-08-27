@@ -39,3 +39,7 @@ element create_element(char* src){
 	
 	return el;
 }
+
+char* get_el_name(element* ptr){
+	return (ptr->shortName.is_long ? ptr->longName.name : ptr->shortName.name);
+}

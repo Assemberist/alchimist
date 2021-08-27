@@ -4,6 +4,3 @@ compile:
 	gcc -c service/*.c
 	gcc -c main.c
 	mv *.o obj/
-	
-
-	
