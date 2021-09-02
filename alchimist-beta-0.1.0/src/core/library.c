@@ -29,6 +29,7 @@ void dispose_library(library* lib){
 
 element create_element(char* src){
 	element el;
+	strtok(src, ":");
 	el.shortName.is_long = strlen(src) >= sizeof(char*) * 2 - 1;
 	if(el.shortName.is_long){
 		el.longName.name = (char*)malloc(strlen(src)+1);

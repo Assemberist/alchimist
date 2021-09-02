@@ -5,7 +5,7 @@ group parse_group(FILE* file){
 	group gr;
 	gr.name_count = 0;
 	size_t capasity = 0;
-	
+
 	char buff[64];
 	memset(buff, 0, 64);
 
@@ -25,7 +25,7 @@ group parse_group(FILE* file){
 
 library load_groups(char* path){
 	library lib;
-	lib.groups = NULL;
+    lib.groups = NULL;
 	lib.group_count = 0;
 
 	FILE* reader;
@@ -68,7 +68,7 @@ library load_groups(char* path){
 	}
 	fclose(reader);
 	closedir(dir);
-	
+
 	return lib;
 }
 

@@ -8,7 +8,7 @@ build: compile
 
 all: compile build tests
 
-compile: clean
+compile:
 	gcc -c core/*.c $(dbg)
 	#gcc -c server/*.c $(dbg)
 	gcc -c service/*.c $(dbg)
