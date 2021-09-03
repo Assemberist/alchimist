@@ -9,6 +9,7 @@ void remove_rec(token* begin){
 		remove_rec(begin->next);
 		free(begin->next);
 	}
+	free(begin->tok);
 }
 
 void remove_tree(token* begin){
