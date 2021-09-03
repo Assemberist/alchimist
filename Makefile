@@ -1,24 +1,20 @@
-dbg = "-g"
+debug: dbg := "-g"
+debug: compile assemble
 
-debug: compile libcore_d
-	gcc -L. obj/* -o alchimist -lalch_core -g
-
-build: compile libcore_b
-	gcc -L. obj/* -o alchimist -lalch_core
+build: dbg := 
+build: compile assemble
 
 all: compile build tests
 
 compile:
-	#gcc -c server/*.c $(dbg)
+	gcc -shared -o libalch_core.so src/core/*.c $(dbg)
+	#gcc -c src/server/*.c $(dbg)
 	gcc -c src/service/*.c $(dbg)
 	gcc -c src/main.c $(dbg)
 	mv *.o obj/
 
-libcore_b:
-	cd src/core; make build
-
-libcore_d:
-	cd src/core; make debug
+assemble:
+	gcc -L. obj/* -o alchimist -lalch_core $(dbg)
 
 clean:
 	rm obj/*
