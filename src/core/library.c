@@ -27,20 +27,6 @@ void dispose_library(library* lib){
 	free(lib->recepts);
 }
 
-element create_element(char* src){
-	element el;
-	strtok(src, ":");
-	el.shortName.is_long = strlen(src) >= sizeof(char*) * 2 - 1;
-	if(el.shortName.is_long){
-		el.longName.name = (char*)malloc(strlen(src)+1);
-		strcpy(el.longName.name, src);
-	}
-	else strcpy(el.shortName.name, src);
-	el.shortName.is_open = (*strtok(NULL, "") == '0' ? 0 : 1);
-	
-	return el;
-}
-
 char* get_el_name(element* ptr){
 	return (ptr->shortName.is_long ? ptr->longName.name : ptr->shortName.name);
 }

@@ -3,7 +3,7 @@
 #include "service/string_tree.h"
 
 int main(){
-	library lib = load_library("/home/sanya/programming/c_lang/alchimist/alchimist-beta-0.1.0/debug");
+	library lib = load_library("/home/assemberist/source/alchimist/alchimist-beta-0.1.0/debug");
 	//check_library();
 	//draw(&lib);
 	for(size_t i = lib.group_count; i--;){

@@ -1,6 +1,20 @@
 #include "../core/loader.h"
 #include "../service/string_tree.h"
 
+element create_element(char* src){
+	element el;
+	strtok(src, ":");
+	el.shortName.is_long = strlen(src) >= sizeof(char*) * 2 - 1;
+	if(el.shortName.is_long){
+		el.longName.name = (char*)malloc(strlen(src)+1);
+		strcpy(el.longName.name, src);
+	}
+	else strcpy(el.shortName.name, src);
+	el.shortName.is_open = (*strtok(NULL, "") == '0' ? 0 : 1);
+	
+	return el;
+}
+
 group parse_group(FILE* file){
 	group gr;
 	gr.name_count = 0;
@@ -35,7 +49,7 @@ library load_groups(char* path){
 
 	DIR* dir;
 	if((dir = opendir(group_name)) == NULL){
-		puts("dir reading error");
+		perror("dir reading error");
 		return lib;
 	}
 
@@ -56,7 +70,7 @@ library load_groups(char* path){
 			group g;
 			reader = fopen(group_name, "r");
 			if(!reader){
-				puts("group read error");
+				perror("group read error");
 				return lib;
 			}
 			g = parse_group(reader);

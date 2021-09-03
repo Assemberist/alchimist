@@ -20,7 +20,6 @@ typedef union element{
 	} shortName;
 }element;
 
-element create_element(char* src);
 char* get_el_name(element* ptr);
 
 typedef struct group{
