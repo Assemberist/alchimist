@@ -1,21 +1,19 @@
+CORE = library.o loader.o string_tree.o
+
 debug: dbg := "-g"
-debug: compile assemble
+debug: corelib server tests
 
 build: dbg := 
-build: compile assemble
+build: corelib server tests
 
-all: compile build tests
-
-compile:
-	gcc -shared -o libalch_core.so src/core/*.c $(dbg)
-	#gcc -c src/server/*.c $(dbg)
+corelib:
+	gcc -c src/core/*.c $(dbg)
 	gcc -c src/service/*.c $(dbg)
-	gcc -c src/main.c $(dbg)
+	gcc -shared -o libalch_core.so $(CORE) $(dbg)
 	mv *.o obj/
 
-assemble:
-	gcc -L. obj/* -o alchimist -lalch_core $(dbg)
+server:
+	gcc -L. src/server/*.c -o server -lalch_core $(dbg)
 
-clean:
-	rm obj/*
-
+tests:
+	gcc -L. src/testTool/*.c -o tester -lalch_core $(dbg)

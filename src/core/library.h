@@ -5,13 +5,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "../service/string_tree.h"
 
 typedef union element{
 	struct{
 		char* name;
-		char _pad[sizeof(char*) - 1];
-		uint8_t is_open:1;
-		uint8_t is_long:1;		
 	} longName;
 	struct{
 		char name[sizeof(char*) * 2 - 1];
@@ -39,6 +37,7 @@ typedef struct library{
 	size_t recept_count;
 	group* groups;
 	size_t group_count;
+	token* worterbuch;
 }library;
 
 element* dualisation(library* lib, element* element1, element* element2);

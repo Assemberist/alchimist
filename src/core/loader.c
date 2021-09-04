@@ -1,5 +1,4 @@
 #include "../core/loader.h"
-#include "../service/string_tree.h"
 
 element create_element(char* src){
 	element el;
