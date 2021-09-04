@@ -86,6 +86,7 @@ void add_element(char* src, void* element, token* begin){
 
 void* find_down(char* src, token* begin){
 	while(begin){
+		if(!begin->tok) return 0;
 		if(*begin->tok == *src){
 			size_t diff = strdif(begin->tok, src);
 

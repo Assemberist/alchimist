@@ -22,12 +22,15 @@ int main(int argc, char** argv){
 	}
 
 	library lib = load_library(argv[1]);
+	if(!(lib.recepts && lib.groups))
+		return -1;
+
 	every_element(&lib, init);
 
 	int (**test_ptr)(library*);
 	for(test_ptr = tests; *test_ptr; test_ptr++){
 		if((*test_ptr)(&lib)){
-			puts("Library is inconsistent");
+			puts("\nLibrary is inconsistent");
 			return -1;
 		}
 

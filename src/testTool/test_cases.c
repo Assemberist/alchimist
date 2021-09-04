@@ -1,13 +1,38 @@
 #include "int_check.h"
 
+#define SUCCESS 0;
+#define ERROR 1;
 // заглушки
 
-int missing(library* lib){return 0;}
 int undiscovered(library* lib){return 0;}
 int unused(library* lib){return 0;}
 int unget(library* lib){return 0;}
 int again_elements(library* lib){return 0;}
 int again_combinate(library* lib){return 0;}
+
+int missing(library* lib){
+	int flag = SUCCESS;
+	int i = lib->recept_count;
+	while(i--){
+		combinate* com = lib->recepts + i;
+		char *names[3] = {
+			com->reagent1 ? get_el_name(com->reagent1) : NULL,
+			com->reagent2 ? get_el_name(com->reagent2) : NULL,
+			com->rezult ? get_el_name(com->rezult) : NULL
+		};
+		if(names[0] && names[1] && names[2]) continue;
+
+		flag = ERROR;
+		printf(
+			"Record corrupted: %s + %s = %s\n",
+			names[0] ? names[0] : "???",
+			names[1] ? names[1] : "???",
+			names[2] ? names[2] : "???"
+		);
+	}
+
+	return flag;
+}
 
 /*
 void find_element_in_andere_groups(library lib, int group_num, int name_num){
@@ -101,39 +126,6 @@ void unused(library lib){
 			nextname: continue;
 		}
 	}
-}
-
-int missing(library lib){
-	int counter = 0;
-	int i = lib.recept_count;
-	while(i--){
-		if(lib.recepts[i].reagent1 && lib.recepts[i].reagent2 && lib.recepts[i].rezult) continue;
-
-		int reagents[3] = {0,0,0};
-		if(lib.recepts[i].reagent1 && lib.recepts[i].reagent1->value[0] & 128) { 
-			lib.recepts[i].reagent1->value[0] ^= 128;
-			reagents[0] = 1;
-		}
-		if(lib.recepts[i].reagent2 && lib.recepts[i].reagent2->value[0] & 128) {
-			lib.recepts[i].reagent2->value[0] ^= 128;
-			reagents[1] = 1;
-		}
-		if(lib.recepts[i].rezult && lib.recepts[i].rezult->value[0] & 128) {
-			lib.recepts[i].rezult->value[0] ^= 128;
-			reagents[2] = 1;
-		}
-		printf(
-			"breaked combinate: %s + %s = %s\n",
-			(lib.recepts[i].reagent1 ? lib.recepts[i].reagent1->value : "???"),
-			(lib.recepts[i].reagent2 ? lib.recepts[i].reagent2->value : "???"),
-			(lib.recepts[i].rezult ? lib.recepts[i].rezult->value : "???")
-		);
-		if(reagents[0]) lib.recepts[i].reagent1->value[0] ^= 128;
-		if(reagents[0]) lib.recepts[i].reagent2->value[0] ^= 128;
-		if(reagents[0]) lib.recepts[i].rezult->value[0] ^= 128;
-		counter++;
-	}
-	return counter;
 }
 
 void undiscovered(library lib){
