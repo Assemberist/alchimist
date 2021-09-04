@@ -2,3 +2,5 @@ air:1
 fire:1
 water:1
 ground:1
+qwe:0
+ewq:0

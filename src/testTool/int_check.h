@@ -20,7 +20,6 @@ typedef union element_ext{
 int missing(library* lib);
 int undiscovered(library* lib);
 int unused(library* lib);
-int unget(library* lib);
 int again_elements(library* lib);
 int again_combinate(library* lib);
 

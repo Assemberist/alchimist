@@ -1,12 +1,8 @@
 #include "int_check.h"
+#include <stdbool.h>
 
 #define SUCCESS 0;
 #define ERROR 1;
-// заглушки
-
-int undiscovered(library* lib){return 0;}
-int unused(library* lib){return 0;}
-int unget(library* lib){return 0;}
 
 int missing(library* lib){
 	int flag = SUCCESS;
@@ -70,107 +66,59 @@ int again_combinate(library* lib){
 	return flag;
 }
 
-/*
+int unused(library* lib){
+	int flag = SUCCESS;
+	size_t i, j;
+	for(i = lib->recept_count; i--;)
+		lib->recepts[i].rezult->shortName.is_open = true;
 
-void open_elements(library lib){
-	int i = lib.group_count;
-	while(i--){
-		int j = lib.groups[i].name_count;
-		while(j-- > 1){
-			lib.groups[i].names[j].value[0] &= 127;
-		}
-	}
-}
-
-void unused(library lib){
-	int i = lib.group_count;	
-	while(i--){
-		int j = lib.groups[i].name_count;
-		while(j--){
-			int s = lib.recept_count;
-			while(s--){
-				char* value = lib.groups[i].names[j].value;
-				if(value == lib.recepts[s].reagent1->value) goto nextname;
-				if(value == lib.recepts[s].reagent2->value) goto nextname;
-				if(value == lib.recepts[s].rezult->value) goto nextname;
-			}
-			char ch = lib.groups[i].names[j].value[0] & 128;
-			lib.groups[i].names[j].value[0] &= 127;
-			printf("unusing element %s in group %s\n", lib.groups[i].names[j].value, lib.groups[i].name);
-			lib.groups[i].names[j].value[0] |= ch;
-			nextname: continue;
-		}
-	}
-}
-
-void undiscovered(library lib){
-	int counter = 0;
-	int i = lib.group_count;
-	while(i--){
-		int j = lib.groups[i].name_count;
-		while(j--){
-			if(!(lib.groups[i].names[j].value[0] & 128)) continue;
-			int s = lib.recept_count;
-			while(s--) if(lib.groups[i].names[j].value == lib.recepts[s].rezult->value) goto nextname;
-			lib.groups[i].names[j].value[0] ^= 128;
-			printf("undiscovered element %s in group %s\n", lib.groups[i].names[j].value, lib.groups[i].name);
-			lib.groups[i].names[j].value[0] ^= 128;
-			nextname: continue;
-		}
-	}
-}
-
-void unget(library lib){
-	int i;
-	int disc = 1;
-	int last = lib.recept_count - 1;
-	
-	for(i=0; i <= last; i++){
-		if(!(
-			lib.recepts[i].reagent1->value[0] & 128 ||
-			lib.recepts[i].reagent2->value[0] & 128 ||
-			lib.recepts[i].rezult->value[0] & 128
-		)) {
-			combinate com = lib.recepts[i];
-			lib.recepts[i] = lib.recepts[last];
-			lib.recepts[last] = com;
-			last--;
-			i--;
-		}
-	}
-	
-	while(last >= 0 && disc){
-		disc = 0;
-		for(i=0; i <= last; i++){
-			if(!(
-				lib.recepts[i].reagent1->value[0] & 128 ||
-				lib.recepts[i].reagent2->value[0] & 128 
-			)) {
-				lib.recepts[i].rezult->value[0] &= 127;
-				combinate com = lib.recepts[i];
-				lib.recepts[i] = lib.recepts[last];
-				lib.recepts[last] = com;
-				disc = 1;
-				last--;
-				i--;
+	for(i = lib->group_count; i--;){
+		group* grp = lib->groups + i;
+		for(j = grp->name_count; j--;){
+			if(grp->names[j].shortName .is_open == NULL){
+				printf("Element %s::%s is not participant of any recepts\n",
+					grp->name,
+					get_el_name(grp->names + j)
+				);
+				flag = ERROR;
 			}
 		}
 	}
 
-	if(last >= 0){
-		for(i=0; i<last+1; i++){
-			lib.recepts[i].reagent1->value[0] &= 127;
-			lib.recepts[i].reagent2->value[0] &= 127;
-			lib.recepts[i].rezult->value[0] &= 127;
-			printf(
-				"asimptote combinate: %s + %s = %s\n",
-				lib.recepts[i].reagent1->value,
-				lib.recepts[i].reagent2->value,
-				lib.recepts[i].rezult->value
-			);
-		}
-	}
+	return flag;
 }
 
+int undiscovered(library* lib){
+	size_t replaced = 0;
 
-*/
+	int replace_flag;
+	for(replace_flag = true; replace_flag; replace_flag = false){
+		size_t i = lib->recept_count - replaced;
+
+		while(i--){
+			combinate com = lib->recepts[i];
+			if(com.reagent1->shortName.is_open && com.reagent2->shortName.is_open){
+				replaced++;
+				replace_flag = true;
+				com.rezult->shortName.is_open = true;
+				lib->recepts[i] = lib->recepts[lib->recept_count - replaced];
+				lib->recepts[lib->recept_count - replaced] = com;
+			}
+		}
+
+		if(replaced == lib->recept_count)
+			return SUCCESS;
+	}
+
+	size_t i = lib->recept_count - replaced;
+	while(i--){
+		combinate* com = lib->recepts + i;
+		printf("Recept %s+%s=%s is unreacheble\n",
+			get_el_name(com->reagent1),
+			get_el_name(com->reagent2),
+			get_el_name(com->rezult)
+		);
+	}
+
+	return ERROR;
+}

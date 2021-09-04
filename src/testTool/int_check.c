@@ -8,7 +8,7 @@ void every_element(library* lib, void(*fun)(element_ext*)){
 }
 
 int (*tests[])(library*) = {
-	missing, undiscovered, unused, unget,
+	missing, undiscovered, unused,
 	again_elements, again_combinate, NULL
 };
 
@@ -30,13 +30,13 @@ int main(int argc, char** argv){
 	int (**test_ptr)(library*);
 	for(test_ptr = tests; *test_ptr; test_ptr++){
 		if((*test_ptr)(&lib)){
-			puts("\nLibrary is inconsistent");
+			puts("Library is inconsistent");
 			return -1;
 		}
 
 		every_element(&lib, reset);
 	}
 
-	puts("\nAll tests completed");
+	puts("All tests completed");
 	return 0;
 }
