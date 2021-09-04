@@ -141,6 +141,6 @@ library load_library(char* path){
 	lib.recepts = combinates.recepts;
 	lib.recept_count = combinates.recept_count;
 
-	remove_tree(wortbook);
+	lib.worterbuch = wortbook;
 	return lib;
 }

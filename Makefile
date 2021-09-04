@@ -1,10 +1,10 @@
 CORE = library.o loader.o string_tree.o
 
 debug: dbg := "-g"
-debug: corelib server tests
+debug: corelib server tests list
 
 build: dbg := 
-build: corelib server tests
+build: corelib server tests list
 
 corelib:
 	gcc -c src/core/*.c $(dbg)
@@ -17,3 +17,7 @@ server:
 
 tests:
 	gcc -L. src/testTool/*.c -o tester -lalch_core $(dbg)
+
+list: list.c
+	gcc -L. list.c -o list -lalch_core $(dbg)
+	

@@ -7,8 +7,6 @@
 int undiscovered(library* lib){return 0;}
 int unused(library* lib){return 0;}
 int unget(library* lib){return 0;}
-int again_elements(library* lib){return 0;}
-int again_combinate(library* lib){return 0;}
 
 int missing(library* lib){
 	int flag = SUCCESS;
@@ -34,25 +32,45 @@ int missing(library* lib){
 	return flag;
 }
 
-/*
-void find_element_in_andere_groups(library lib, int group_num, int name_num){
-	char* src = lib.groups[group_num].names[name_num].value;
-	int i = group_num;
-	while(i-- > 0){
-		int j = lib.groups[i].name_count;
-		while(j-- > 0){
-			if(!strcmp(lib.groups[i].names[j].value, src)){
-				printf(
-					"multiple input element: %s in group %s and group %s\n",
-					lib.groups[i].names[j].value,
-					lib.groups[group_num].name,
-					lib.groups[i].name
-				);
-				return;
+int again_elements(library* lib){
+	int flag = SUCCESS;
+	size_t i, j;
+	for(i = lib->group_count; i--;){
+		for(j = lib->groups[i].name_count; j--;){
+			element* val = lib->groups[i].names + j;
+			if(find_element(get_el_name(val), lib->worterbuch) != val){
+				printf("Duplicate of element found: %s::%s\n", lib->groups[i].name, get_el_name(val));
+				flag = ERROR;
 			}
 		}
 	}
+
+	return flag;
 }
+
+int again_combinate(library* lib){
+	int flag = SUCCESS;
+	size_t i, j;
+	for(i = lib->recept_count; --i;){
+		combinate* com_i = lib->recepts + i;
+		for(j = i; j--;){
+			combinate* com_j = lib->recepts + j;
+			if(	(com_i->reagent1 == com_j->reagent1 && com_i->reagent2 == com_j->reagent2) ||
+				(com_i->reagent1 == com_j->reagent2 && com_i->reagent2 == com_j->reagent1)
+			){
+				printf("Duplicat of recept found: %s::%s\n",
+						get_el_name(com_i->reagent1),
+						get_el_name(com_i->reagent2));
+
+				flag = ERROR;
+			}
+		}
+	}
+
+	return flag;
+}
+
+/*
 
 void open_elements(library lib){
 	int i = lib.group_count;
@@ -61,49 +79,6 @@ void open_elements(library lib){
 		while(j-- > 1){
 			lib.groups[i].names[j].value[0] &= 127;
 		}
-	}
-}
-
-void again_elements(library lib){
-	open_elements(lib);
-	int i = lib.group_count;
-	while(i--){
-		int j = lib.groups[i].name_count;
-		while(j-- > 0){
-			int k = j;
-			while(k-- > 0){
-				if(!strcmp(lib.groups[i].names[j].value, lib.groups[i].names[k].value)){
-					printf(
-						"multiple input element: %s in group %s and group %s\n",
-						lib.groups[i].names[j].value,
-						lib.groups[i].name,
-						lib.groups[i].name
-					);
-					goto next_element;
-				}
-			}
-			find_element_in_andere_groups(lib, i, j);
-			next_element: continue;
-		}
-	}
-}
-
-void again_combinate(library lib){
-	int i = lib.recept_count;
-	while(--i){
-		int j = i-1;
-		while(j--){
-			if(
-				(lib.recepts[i].reagent1 == lib.recepts[j].reagent1 &&
-				lib.recepts[i].reagent2 == lib.recepts[j].reagent2) ||
-				(lib.recepts[i].reagent1 == lib.recepts[j].reagent2 &&
-				lib.recepts[i].reagent2 == lib.recepts[j].reagent1)
-			) {
-				printf("has collision for combination: %s + %s\n", lib.recepts[i].reagent1->value, lib.recepts[i].reagent2->value);
-				goto nextcom;
-			}
-		}
-		nextcom: continue;
 	}
 }
 
