@@ -9,7 +9,7 @@ element create_element(char* src){
 		strcpy(el.longName.name, src);
 	}
 	else strcpy(el.shortName.name, src);
-	el.shortName.is_open = (*strtok(NULL, "") == '0' ? 0 : 1);
+	el.shortName.is_open = (*strtok(NULL, "") == '0' ? 0 : 127);
 	
 	return el;
 }

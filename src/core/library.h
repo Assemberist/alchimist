@@ -13,8 +13,8 @@ typedef union element{
 	} longName;
 	struct{
 		char name[sizeof(char*) * 2 - 1];
-		uint8_t is_open:1;
 		uint8_t is_long:1;
+		uint8_t is_open:7;
 	} shortName;
 }element;
 
@@ -40,7 +40,7 @@ typedef struct library{
 	token* worterbuch;
 }library;
 
-element* dualisation(library* lib, element* element1, element* element2);
+element* dualisation(library* lib, element* element1, element* element2, size_t session);
 void dispose_library(library* lib);
 
 #endif
