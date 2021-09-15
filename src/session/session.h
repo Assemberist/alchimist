@@ -1,7 +1,6 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-#include <stdint.h>
 #include "../core/loader.h"
 
 #define gamer_capacity 20
@@ -27,5 +26,9 @@ typedef struct game_server{
 	int listener;
 	size_t open_sessions;
 }game_server;
+
+session new_session(char* path, int16_t id);
+int gamer_connect(session* ses, char* login, int new_socket);
+void gamer_disconnect(session* ses, size_t client_num);
 
 #endif

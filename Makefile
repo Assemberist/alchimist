@@ -13,7 +13,7 @@ corelib:
 	mv *.o obj/
 
 server:
-	gcc -L. src/server/*.c -o server -lalch_core $(dbg)
+	gcc -L. src/session/*.c -o game_server -lalch_core $(dbg)
 
 tests:
 	gcc -L. src/testTool/*.c -o tester -lalch_core $(dbg)

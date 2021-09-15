@@ -75,7 +75,7 @@ int unused(library* lib){
 	for(i = lib->group_count; i--;){
 		group* grp = lib->groups + i;
 		for(j = grp->name_count; j--;){
-			if(grp->names[j].shortName .is_open == NULL){
+			if(grp->names[j].shortName .is_open == 0){
 				printf("Element %s::%s is not participant of any recepts\n",
 					grp->name,
 					get_el_name(grp->names + j)
