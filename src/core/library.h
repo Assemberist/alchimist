@@ -40,8 +40,8 @@ typedef struct library{
 	token* worterbuch;
 }library;
 
-char** search_libs(const char* lib_foulder);
-
+void* read_file(char* path, void(*parser)(char*, void*, void*), size_t element_size, void* args, size_t* rows);
+char** search_libs(const char* lib_foulder, size_t* len);
 element* dualisation(library* lib, element* element1, element* element2, size_t session);
 void dispose_library(library* lib);
 

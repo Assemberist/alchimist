@@ -7,7 +7,7 @@ build: dbg :=
 build: corelib server tests list
 
 corelib:
-	gcc -c src/core/*.c $(dbg)
+	gcc -c src/core/*.c $(dbg) -fPIC
 	gcc -c src/service/*.c $(dbg)
 	gcc -shared -o libalch_core.so $(CORE) $(dbg)
 	mv *.o obj/

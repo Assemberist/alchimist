@@ -36,7 +36,14 @@ char* get_el_name(element* ptr){
 	return (ptr->shortName.is_long ? ptr->longName.name : ptr->shortName.name);
 }
 
-char** search_libs(const char* lib_foulder){
+void parse_lib(char* src, void* el, void*){
+	size_t len = strlen(src);
+	*((char**)el) = malloc(len);
+	strcpy(*(char**)el, src);
+	(*((char**)el))[len-1] = '\0';
+}
+
+char** search_libs(const char* lib_foulder, size_t* len){
 	size_t path_len = sizeof(lib_foulder);
 
 	char buffer[512];
@@ -50,27 +57,29 @@ char** search_libs(const char* lib_foulder){
 	strcpy(buffer, lib_foulder);
 	strcat(buffer, "library_list.txt");
 
-	FILE* file = fopen(buffer, "r");
+	return read_file(buffer, parse_lib, sizeof(char*), NULL, len);
+}
+
+void* read_file(char* path, void(*parser)(char*, void*, void*), size_t element_size, void* args, size_t* rows){
+	FILE* file = fopen(path, "r");
 	if(!file) return 0;
+
+	char buffer[512];
 
 	size_t i = 0;
 	while(fgets(buffer, 512, file)) i++;
+	if(rows) *rows = i;
 	
-	char** libraries = (char**)malloc(sizeof(char*) * i + 1);
-	libraries[i] = NULL;
+	size_t len = element_size * i;
+	void* ptr = malloc(len);
 
 	rewind(file);
 
-	size_t len;
-	while(i--){
+	for(i = 0; i<len; i+=element_size){
 		fgets(buffer, 512, file);
-		len = strlen(buffer);
-		libraries[i] = (char*)malloc(len);
-		strcpy(libraries[i], buffer);
-		libraries[i][len-1] = '\0';
+		parser(buffer, (int8_t*)ptr + i, args);
 	}
 
 	fclose(file);
-	
-	return libraries;
+	return ptr;
 }

@@ -3,5 +3,3 @@ air+fire=energy
 water+air=myst
 ground+water=gryaz
 ground+air=pil
-qwe+air=ewq
-ewq+air=qwe

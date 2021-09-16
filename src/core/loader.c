@@ -1,47 +1,21 @@
 #include "../core/loader.h"
+#include <stddef.h>
 
-element create_element(char* src){
-	element el;
+void create_element(char* src, void* el, void* args){
 	strtok(src, ":");
-	el.shortName.is_long = strlen(src) >= sizeof(char*) * 2 - 1;
-	if(el.shortName.is_long){
-		el.longName.name = (char*)malloc(strlen(src)+1);
-		strcpy(el.longName.name, src);
+	((element*)el)->shortName.is_long = strlen(src) >= sizeof(char*) * 2 - 1;
+	if(((element*)el)->shortName.is_long){
+		((element*)el)->longName.name = (char*)malloc(strlen(src)+1);
+		strcpy(((element*)el)->longName.name, src);
 	}
-	else strcpy(el.shortName.name, src);
-	el.shortName.is_open = (*strtok(NULL, "") == '0' ? 0 : 127);
-	
-	return el;
-}
-
-group parse_group(FILE* file){
-	group gr;
-	gr.name_count = 0;
-	size_t capasity = 0;
-
-	char buff[64];
-	memset(buff, 0, 64);
-
-	while(fgets(buff, 64, file)) capasity++;
-	gr.names = (element*)malloc(capasity * sizeof(element));
-	memset(gr.names, 0, capasity * sizeof(element));
-
-	rewind(file);
-
-	while(gr.name_count < capasity){
-		fgets(buff, 64, file);
-		gr.names[gr.name_count] = create_element(buff);
-		gr.name_count++;
-	}
-	return gr;
+	else strcpy(((element*)el)->shortName.name, src);
+	((element*)el)->shortName.is_open = (*strtok(NULL, "\n") == '0' ? 0 : 127);
 }
 
 library load_groups(char* path){
 	library lib;
     lib.groups = NULL;
 	lib.group_count = 0;
-
-	FILE* reader;
 
 	char group_name[PATH_MAX];
     sprintf(group_name, "%s%s", path, "/groups");
@@ -66,61 +40,39 @@ library load_groups(char* path){
         char* file_name = f_cur->d_name;
 		if(file_name[0] != '.'){
             sprintf(group_name, "%s%s%s", path, "/groups/", file_name);
+
 			group g;
-			reader = fopen(group_name, "r");
-			if(!reader){
-				perror("group read error");
-				return lib;
-			}
-			g = parse_group(reader);
+			g.names = read_file(group_name, create_element, sizeof(element), NULL, &g.name_count);
 			g.name = (char*)malloc(strlen(file_name) - 4);
 			strncpy(g.name, file_name, strlen(file_name) - 4);
+
 			lib.groups[lib.group_count] = g;
 			lib.group_count++;
 		}
 	}
-	fclose(reader);
 	closedir(dir);
 
 	return lib;
 }
 
+void create_combinate(char* src, void* el, void* args){
+	char* ptr = strtok(src, "+");
+	((combinate*)el)->reagent1 = find_element(ptr, (token*)args);
+
+	ptr = strtok(NULL, "=");
+	((combinate*)el)->reagent2 = find_element(ptr, (token*)args);
+
+	ptr = strtok(NULL, "\n");
+	((combinate*)el)->rezult = find_element(ptr, (token*)args);
+}
+
 library load_combinates(token* worterbuch, char* path){
 	library lib;
-    lib.recepts = NULL;
 
 	char group_name[PATH_MAX];
 	sprintf(group_name, "%s%s", path, "/combinates.txt");
 
-	char buff[200];
-
-	FILE* reader = fopen(group_name, "r");
-	if(!reader){
-		puts("combinates.txt not open");
-		return lib;
-	}
-
-	size_t str_count = 0;
-	while(!feof(reader)) {
-		fgets(buff, 200, reader);
-		str_count++;
-	}
-	rewind(reader);
-
-	lib.recepts = (combinate*)malloc(sizeof(combinate) * str_count);
-
-	for(lib.recept_count = 0; lib.recept_count < str_count - 1; lib.recept_count++){
-		fgets(buff, 200, reader);
-		char* ptr = strtok(buff, "+");
-        lib.recepts[lib.recept_count].reagent1 = find_element(ptr, worterbuch);
-
-		ptr = strtok(NULL, "=");
-        lib.recepts[lib.recept_count].reagent2 = find_element(ptr, worterbuch);
-
-		ptr = strtok(NULL, "\n");
-        lib.recepts[lib.recept_count].rezult = find_element(ptr, worterbuch);
-	}
-	fclose(reader);
+	lib.recepts = read_file(group_name, create_combinate, sizeof(combinate), worterbuch, &lib.recept_count);
 	return lib;
 }
 
