@@ -1,18 +1,13 @@
 #include "session.h"
 
-session new_session(char* path, int16_t id){
-	return (session){load_library(path), NULL, path, 0, id};
+void new_guest(game_server* game, int sock){
+
 }
 
-int gamer_connect(session* ses, char* login, int new_socket){
-	if(ses->gamer_count == gamer_capacity)
-		return -1;
+void guest_leave(game_server* game, size_t id){
+
+}
+
+void gamer_leave(game_server* game, size_t session_num, size_t id){
 	
-	ses->gamers[ses->gamer_count] = (client){new_socket, login, 0, 0};
-	return 0;
-}
-
-void gamer_disconnect(session* ses, size_t client_num){
-	if(ses->gamer_count)
-		ses->gamers[client_num] = ses->gamers[--ses->gamer_count];
 }
