@@ -6,3 +6,4 @@ tester
 list
 game_server
 *.txt
+*.beam

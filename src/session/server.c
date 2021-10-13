@@ -18,6 +18,7 @@ int main(){
 	char** list = search_libs("/home/assemberist/source/alchimist/", &len);
 	
 	game_server game;
+	new_game(&game);
 
     struct sockaddr_in serv_addr;
     memset(&serv_addr, '0', sizeof(serv_addr));
@@ -52,19 +53,21 @@ int main(){
 			default:{
 				size_t i = game.guest_count;
 				while(i--){
-					if(FD_ISSET(game.guests[i].client_socket, &game.lobby))
-						switch(read(game.guests[i].client_socket, reader, 500)){
+					int requester = game.guests[i].client_socket;
+					if(FD_ISSET(requester, &game.lobby))
+						switch(read(requester, reader, 500)){
 							case -1:
 								break;
 							case 0:
-								printf("socket %i closed\n", game.guests[i].client_socket);
+								printf("socket %i closed\n", requester);
 								guest_leave(&game, i);
 								break;
 							default:{
+								printf("new request from %i: %s\n", requester, reader);
 								requester_info info;
 								info.guest.is_guest = 1;
 								info.guest.num = i;
-								free(handle_request(&game, reader, info));
+								handle_request(&game, reader, info);
 							}
 						}
 				}
@@ -92,11 +95,12 @@ int main(){
 									gamer_leave(&game, j, i);
 									break;
 								default:{
+									printf("new request from %i: %s", gomer, reader);
 									requester_info info;
 									info.client.is_guest = 0;
 									info.client.session_num = j;
 									info.client.id = i;
-									free(handle_request(&game, reader, info));
+									handle_request(&game, reader, info);
 								}
 							}
 					}

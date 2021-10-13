@@ -1,7 +1,7 @@
 CORE = library.o loader.o string_tree.o
 
 debug: dbg := "-g"
-debug: corelib server tests list
+debug: corelib server tests list client
 
 build: dbg := 
 build: corelib server tests list
@@ -21,3 +21,5 @@ tests:
 list: list.c
 	gcc -L. list.c -o list -lalch_core $(dbg)
 	
+client: src/erl_client/erl_client.erl
+	erlc src/erl_client/erl_client.erl

@@ -15,6 +15,6 @@ typedef union requester_info{
     }client;
 } requester_info;
 
-char* handle_request(game_server* game, char* src, requester_info info);
+void handle_request(game_server* game, char* src, requester_info info);
 
 #endif
