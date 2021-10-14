@@ -9,6 +9,14 @@ typedef struct request_text{
     char* text;
 }request_text;
 
+#define MSG_WRONG_REQUEST "Error: unknown request. Fuck you!"
+#define MSG_LARGE_NAME "Error: Too large name. Fuck you!"
+#define MSG_NO_NAME "Error: Name does not setted. Fuck you!"
+#define MSG_LEAVE "Get out from my game!"
+#define MSG_NO_SESSION_ID "Error session number does not setted. Fuck you!"
+#define MSG_WRONG_SESSION_ID "Error: Sessions can be from 0 to 7, you, moron! Fuck you!"
+#define MSG_DONE "Done"
+
 void _ADMIN_KICK_GUEST(game_server*, char*, requester_info);
 void _ADMIN_KICK_ALL_GUESTS(game_server*, char*, requester_info);
 void _ADMIN_RENAME_GUEST(game_server*, char*, requester_info);
@@ -19,6 +27,7 @@ void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server*, char*, requester_info);
 void _ADMIN_RENAME_CLIENT(game_server*, char*, requester_info);
 void _ADMIN_KILL_SESSION(game_server*, char*, requester_info);
 void _ADMIN_EXTERMINANTUS(game_server*, char*, requester_info);
+void _LIST_LOBBY(game_server* game, char* src, requester_info info);
 void _LIST_GAMERS(game_server*, char*, requester_info);
 void _SET_NAME(game_server*, char*, requester_info);
 void _LIST_SESSIONS(game_server*, char*, requester_info);

@@ -29,6 +29,8 @@ typedef struct session{
 }session;
 
 typedef struct game_server{
+	char** libraryes;
+	size_t library_count;
 	session sessions[max_sessions];
 	user guests[max_lobby];
 	size_t guest_count;
@@ -39,6 +41,7 @@ void new_game(game_server* game);
 
 void new_guest(game_server* game, int sock);
 void guest_leave(game_server* game, size_t id);
+void new_gamer(game_server* game, size_t session_num, size_t id);
 void gamer_leave(game_server* game, size_t session_num, size_t id);
 
 #endif

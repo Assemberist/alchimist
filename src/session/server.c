@@ -14,11 +14,9 @@
 #include "protocol.h"
 
 int main(){
-	size_t len;
-	char** list = search_libs("/home/assemberist/source/alchimist/", &len);
-	
 	game_server game;
 	new_game(&game);
+	game.libraryes = search_libs("/home/assemberist/source/alchimist/", &game.library_count);
 
     struct sockaddr_in serv_addr;
     memset(&serv_addr, '0', sizeof(serv_addr));
@@ -61,6 +59,7 @@ int main(){
 							case 0:
 								printf("socket %i closed\n", requester);
 								guest_leave(&game, i);
+								close(requester);
 								break;
 							default:{
 								printf("new request from %i: %s\n", requester, reader);
@@ -93,6 +92,7 @@ int main(){
 								case 0:
 									printf("gamer on socket %i closed\n", gomer);
 									gamer_leave(&game, j, i);
+									close(gomer);
 									break;
 								default:{
 									printf("new request from %i: %s", gomer, reader);
@@ -109,12 +109,9 @@ int main(){
 		}
 	}
 
-	while (len--) {
-		puts(list[len]);
-		free(list[len]);
-	}
-
-	free(list);
+	while (game.library_count--)
+		free(game.libraryes[game.library_count]);
+	free(game.libraryes);
 
 	return 0;
 }
