@@ -36,7 +36,7 @@ int main(){
 
 	char reader[500];
 
-	while(1){
+	while(!game.enough){
 		int tmp_sock;
 		if((tmp_sock = accept(listener, NULL, NULL)) != -1){
 			printf("One more connection on socket %i\n", tmp_sock);

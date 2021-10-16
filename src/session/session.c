@@ -10,6 +10,7 @@ void new_game(game_server* game){
         game->sessions[i].path = NULL;
         game->sessions[i].session_id = i;
         FD_ZERO(&game->sessions[i].readers);
+        game->enough = 0;
     }
 }
 
@@ -29,10 +30,14 @@ void guest_leave(game_server* game, size_t id){
     game->guest_count--;
 }
 
-void new_gamer(game_server* game, size_t session_num, size_t id){
-    
+void new_gamer(game_server* game, size_t session_num, size_t id, requester_info info){
+    // name should be copyed with mem allocation
 }
 
 void gamer_leave(game_server* game, size_t session_num, size_t id){
 	
+}
+
+void open_session(game_server* game, size_t id, char* src){
+    
 }

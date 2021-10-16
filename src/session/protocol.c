@@ -7,8 +7,7 @@ request_text request_handlers[] = {
     {_ADMIN_KICK_GUEST, "I command to kick this guest"},
     {_ADMIN_KICK_ALL_GUESTS, "I command to kick all guests"},
     {_ADMIN_RENAME_GUEST, "I command to name he as"},
-    {_ADMIN_KICK_CLIENT_FROM_SESSION, "I command to kick this gay"},
-    {_ADMIN_KICK_CLIENT_FROM_SERVER, "I command this gay get out from my server"},
+    {_ADMIN_KICK_CLIENT, "I command this gay get out from my server"},
     {_ADMIN_KICK_ALL_CLIENTS_FROM_SESSION, "I command kick all gays"},
     {_ADMIN_KICK_ALL_CLIENTS_FROM_SERVER, "I command all gays get out from my server"},
     {_ADMIN_RENAME_CLIENT, "I command to name that gay as"},
@@ -26,6 +25,10 @@ request_text request_handlers[] = {
     {_LEAVE, "I`m out"},
     {_WRONG_REQUEST, NULL}
 };
+
+////////////////////////////////////////////////////////////////////////////////////////
+// service functions                                                                ////
+////////////////////////////////////////////////////////////////////////////////////////
 
 void handle_request(game_server* game, char* src, requester_info info){
     strtok(src, ":");
@@ -52,20 +55,213 @@ char** get_requester_name(game_server* game, requester_info info){
     );
 }
 
-void _ADMIN_KICK_GUEST(game_server* game, char* src, requester_info info){}
-void _ADMIN_KICK_ALL_GUESTS(game_server* game, char* src, requester_info info){}
-void _ADMIN_RENAME_GUEST(game_server* game, char* src, requester_info info){}
-void _ADMIN_KICK_CLIENT_FROM_SESSION(game_server* game, char* src, requester_info info){}
-void _ADMIN_KICK_CLIENT_FROM_SERVER(game_server* game, char* src, requester_info info){}
+int check_session(char* src, int sock){
+    if(!src)
+        write(sock, MSG_NO_SESSION_ID, sizeof(MSG_NO_SESSION_ID));
+    else if(src[0] > '7' || src[0] < '0') 
+        write(sock, MSG_WRONG_SESSION_ID, sizeof(MSG_WRONG_SESSION_ID));
+    else return 1;
+
+    return 0;
+}
+
+size_t check_client_id(char* src, int sock){
+    if(!src){
+        write(sock, MSG_NO_NAME, sizeof(MSG_NO_NAME));
+        return gamer_capacity;
+    }
+
+    size_t num = atoi(src);
+
+    if(num >= gamer_capacity){
+        write(sock, MSG_WRONG_CLIENT_ID, sizeof(MSG_WRONG_CLIENT_ID));
+        return gamer_capacity;
+    }
+
+    return num;
+}
+
+void move_client(game_server* game, requester_info from, requester_info to){
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+// request handlers                                                                 ////
+////////////////////////////////////////////////////////////////////////////////////////
+
+// no check
+void _ADMIN_KICK_GUEST(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(!src){
+        write(requester_socket, MSG_NO_NAME, sizeof(MSG_NO_NAME));
+        return;
+    }
+
+    size_t num = atoi(src);
+    requester_info jackass;
+    jackass.guest.is_guest = 1;
+    jackass.guest.num = num;
+
+    write(get_requester_socket(game, jackass), MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
+    _LEAVE(game, NULL, jackass);
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
+}
+
+// no check
+void _ADMIN_KICK_ALL_GUESTS(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    size_t i = game->guest_count;
+    while(i--){
+        requester_info jackass;
+        jackass.guest.is_guest = 1;
+        jackass.guest.num = i;
+
+        write(game->guests[i].client_socket, MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
+        _LEAVE(game, NULL, jackass);
+    }
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
+}
+
+// no check
+void _ADMIN_RENAME_GUEST(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(!src){
+        write(requester_socket, MSG_NO_NAME, sizeof(MSG_NO_NAME));
+        return;
+    }
+
+    size_t num = atoi(src);
+
+    requester_info jackass;
+    jackass.guest.is_guest = 1;
+    jackass.guest.num = num;
+
+    src = strtok(NULL, ":");
+
+    if(!src){
+        write(requester_socket, MSG_NO_NAME, sizeof(MSG_NO_NAME));
+        return;
+    }
+
+    write(game->guests[num].client_socket, MSG_ADMIN_RENAME, sizeof(MSG_ADMIN_RENAME));
+    _SET_NAME(game, src, jackass);
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
+}
+
+void _ADMIN_KICK_CLIENT(game_server* game, char* src, requester_info info){}
 void _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game_server* game, char* src, requester_info info){}
 void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server* game, char* src, requester_info info){}
 void _ADMIN_RENAME_CLIENT(game_server* game, char* src, requester_info info){}
 void _ADMIN_KILL_SESSION(game_server* game, char* src, requester_info info){}
-void _ADMIN_EXTERMINANTUS(game_server* game, char* src, requester_info info){}
 
+// no check
+void _ADMIN_EXTERMINANTUS(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    _ADMIN_KICK_ALL_GUESTS(game, NULL, info);
+
+    size_t i = max_sessions;
+    char buffer[] = "0";
+    while(i--){
+        buffer[0] = '0' + i;
+        _ADMIN_KILL_SESSION(game, buffer, info);
+    }
+
+    game->enough = 1;
+
+    write(requester_socket, MSG_EXTERMINATED, sizeof(MSG_EXTERMINATED));
+}
+
+// no ready
 void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){}
-void _CREATE_SESSION(game_server* game, char* src, requester_info info){}
-void _CONNECT_SESSION(game_server* game, char* src, requester_info info){}
+
+// no check
+void _CREATE_SESSION(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(!src){
+        write(requester_socket, "Error: Library required. Fuck you", sizeof(MSG_DONE));
+        return;
+    }
+ 
+    char* force = strtok(NULL, ":");
+
+    requester_info to;
+    to.client.is_guest = 0;
+    to.client.id = 0;
+
+    char* answer;
+    size_t i;
+
+    size_t lib = game->library_count;
+    while(lib--)
+        if(!strcmp(game->libraryes[lib], src))
+            goto found;
+
+    answer = "Error: No that library. Fuck you!";
+    goto exit;
+
+found:
+
+    if(!force){
+        i = max_sessions;
+        while(i--){
+            if(game->libraryes[lib] == game->sessions[i].path){
+                char buffer[sizeof(MSG_SESSION_EXIST)] = MSG_SESSION_EXIST;
+                buffer[sizeof(MSG_SESSION_EXIST)-1] = '0' + i;
+                answer = buffer;
+                goto exit;
+            }
+        }
+    }
+
+    i = max_sessions;
+    while(i--){
+        if(!game->sessions[i].path)
+            goto connect;
+
+        if(game->sessions[i].gamer_count == 0){
+            dispose_library(&game->sessions[i].lib);
+            goto connect;
+        }
+    }
+
+    answer = "Error: All sessions busy. Fuck you!";
+    goto exit;
+
+connect:
+
+    open_session(game, i, game->libraryes[lib]);
+    to.client.session_num = i;
+    move_client(game, info, to);
+    answer = MSG_DONE;
+
+exit:
+
+    write(requester_socket, answer, strlen(answer)+1);
+}
+
+// no check
+void _CONNECT_SESSION(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+    if(!check_session(src, requester_socket)) return;
+
+    if(game->sessions[*src - '0'].gamer_count == gamer_capacity){
+        write(requester_socket, "Error: session is busy", sizeof("Error: session is busy"));
+        return;
+    }
+
+    new_gamer(game, *src - '0', requester_socket, info);
+    _LEAVE(game, NULL, info);
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
+}
 
 // no check
 void _LIST_SESSIONS(game_server* game, char* src, requester_info info){

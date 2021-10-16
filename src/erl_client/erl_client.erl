@@ -1,5 +1,5 @@
 -module(erl_client).
--export([receiver/1, reader/1, one_request/0]).
+-export([initial/1, receiver/1, reader/1, one_request/0]).
 
 -define(requests,[
     "I command to kick all guests",                 %1
@@ -23,6 +23,9 @@
     "Now i`m",              %18
     "Who connected"         %19
 ]).
+
+initial(Sock) ->
+    Sock.
 
 one_request() ->
     {ok, Sock} = gen_tcp:connect(loopback, 5000, [{active, false}], 2000),

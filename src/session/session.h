@@ -35,13 +35,27 @@ typedef struct game_server{
 	user guests[max_lobby];
 	size_t guest_count;
 	fd_set lobby;
+	int enough;
 }game_server;
 
+typedef union requester_info{
+    struct{
+        int8_t is_guest:1;
+        int8_t num:7;
+    }guest;
+    struct{
+        int8_t is_guest:1;
+        int8_t session_num:3;
+        int8_t id:4;
+    }client;
+} requester_info;
+
 void new_game(game_server* game);
+void open_session(game_server* game, size_t id, char* src);
 
 void new_guest(game_server* game, int sock);
 void guest_leave(game_server* game, size_t id);
-void new_gamer(game_server* game, size_t session_num, size_t id);
+void new_gamer(game_server* game, size_t session_num, size_t id, requester_info info);
 void gamer_leave(game_server* game, size_t session_num, size_t id);
 
 #endif
