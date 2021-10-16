@@ -16,7 +16,6 @@ typedef struct request_text{
 #define MSG_NO_SESSION_ID "Error: session number does not setted. Fuck you!"
 #define MSG_WRONG_SESSION_ID "Error: Sessions can be from 0 to 7, you, moron! Fuck you!"
 #define MSG_WRONG_CLIENT_ID "Error: There is no that gay on server. Fuck you!"
-#define MSG_ADMIN_KICK "Admin: Enough! Get out!"
 #define MSG_ADMIN_KILL "Admin: Go to gazenwagen!"
 #define MSG_ADMIN_RENAME "Admin: Your name now"
 #define MSG_SESSION_EXIST "Warn: There is same session: "

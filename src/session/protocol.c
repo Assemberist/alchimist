@@ -103,7 +103,7 @@ void _ADMIN_KICK_GUEST(game_server* game, char* src, requester_info info){
     jackass.guest.is_guest = 1;
     jackass.guest.num = num;
 
-    write(get_requester_socket(game, jackass), MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
+    write(game->guests[num].client_socket, MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
     _LEAVE(game, NULL, jackass);
 
     write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
@@ -154,9 +154,63 @@ void _ADMIN_RENAME_GUEST(game_server* game, char* src, requester_info info){
     write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
 }
 
-void _ADMIN_KICK_CLIENT(game_server* game, char* src, requester_info info){}
-void _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game_server* game, char* src, requester_info info){}
-void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server* game, char* src, requester_info info){}
+// no check
+void _ADMIN_KICK_CLIENT(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(!check_session(src, requester_socket)) return;
+
+    char* client_text = strtok(NULL, ":");
+    size_t client_id = check_client_id(src, requester_socket);
+    if(client_id == gamer_capacity) return;
+
+    requester_info jackass;
+    jackass.client.is_guest = 0;
+    jackass.client.session_num = *src - '0';
+    jackass.client.id = client_id;
+
+    write(get_requester_socket(game, jackass), MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
+    _LEAVE(game, NULL, jackass);
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
+}
+
+// no check
+void _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(!check_session(src, requester_socket)) return;
+    session* session_ptr = game->sessions + *src - '0';
+
+    requester_info jackass;
+    jackass.client.is_guest = 0;
+    jackass.client.session_num = *src - '0';
+
+    size_t i;
+    for(i = 0; i < session_ptr->gamer_count; i++){
+        jackass.client.id = i;
+
+        write(session_ptr->gamers[i].data.client_socket, MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
+        _LEAVE(game, NULL, jackass);
+    }
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
+}
+
+// no check
+void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    char buffer[] = " ";
+    size_t i = max_sessions;
+    while(i--){
+        buffer[0] = '0' + i;
+        _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game, buffer, info);
+    }
+
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
+}
+
 void _ADMIN_RENAME_CLIENT(game_server* game, char* src, requester_info info){}
 void _ADMIN_KILL_SESSION(game_server* game, char* src, requester_info info){}
 
