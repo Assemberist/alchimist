@@ -29,7 +29,6 @@ void _ADMIN_KICK_CLIENT(game_server*, char*, requester_info);
 void _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game_server*, char*, requester_info);
 void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server*, char*, requester_info);
 void _ADMIN_RENAME_CLIENT(game_server*, char*, requester_info);
-void _ADMIN_KILL_SESSION(game_server*, char*, requester_info);
 void _ADMIN_EXTERMINANTUS(game_server*, char*, requester_info);
 void _LIST_LOBBY(game_server* game, char* src, requester_info info);
 void _LIST_GAMERS(game_server*, char*, requester_info);

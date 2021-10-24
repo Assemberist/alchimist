@@ -8,7 +8,6 @@ element* dualisation(library* lib, element* element1, element* element2, size_t 
 		for(i = lib->recept_count; i--;){
 			combinate* com = lib->recepts + i;
 			if((com->reagent1 == element1 && com->reagent2 == element2) || (com->reagent1 == element2 && com->reagent2 == element1)){
-				com->rezult->shortName.is_open |= 1 << session;
 				return com->rezult;
 			}
 		}

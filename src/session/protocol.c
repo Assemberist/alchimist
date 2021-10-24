@@ -11,7 +11,6 @@ request_text request_handlers[] = {
     {_ADMIN_KICK_ALL_CLIENTS_FROM_SESSION, "I command kick all gays"},
     {_ADMIN_KICK_ALL_CLIENTS_FROM_SERVER, "I command all gays get out from my server"},
     {_ADMIN_RENAME_CLIENT, "I command to name that gay as"},
-    {_ADMIN_KILL_SESSION, "I command all go fuck yourself"},
     {_ADMIN_EXTERMINANTUS, "I command to execute exterminatus on this server. This resourse should be burned in a cleansing fire"},
 
     {_SET_NAME, "Now i`m"},
@@ -36,7 +35,7 @@ void handle_request(game_server* game, char* src, requester_info info){
     for(ptr = request_handlers; ptr->text; ptr++)
         if(!strcmp(src, ptr->text)) break;
 
-    ptr->handler(game, strtok(NULL, ""), info);
+    ptr->handler(game, strtok(NULL, ":"), info);
 }
 
 int get_requester_socket(game_server* game, requester_info info){
@@ -83,6 +82,24 @@ size_t check_client_id(char* src, int sock){
 
 void move_client(game_server* game, requester_info from, requester_info to){
 
+}
+
+element* check_element(char* src, int sock, token* worterbuch){
+    if(!src){
+        write(sock, "Error: Element is not setted. Fuck you!", sizeof("Error: Element is not setted. Fuck you!"));
+        return NULL;
+    }
+
+    element* element = find_element(src, worterbuch);
+
+    if(!element){
+        char buffer[200] = "Error: There is no \"";
+        strcat(src, get_el_name(element));
+        strcat(src, "\" element");
+        write(sock, buffer, strlen(buffer+1));
+    }
+
+    return element;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +211,13 @@ void _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game_server* game, char* src, requeste
         _LEAVE(game, NULL, jackass);
     }
 
+    char* del = strtok(src, ":");
+    if(del) if(*del == 'd') {
+        session_ptr->path = NULL;
+        dispose_library(&session_ptr->lib);
+        session_ptr->max_desc = 0;
+    }
+
     write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
 }
 
@@ -211,8 +235,31 @@ void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server* game, char* src, requester
     write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
 }
 
-void _ADMIN_RENAME_CLIENT(game_server* game, char* src, requester_info info){}
-void _ADMIN_KILL_SESSION(game_server* game, char* src, requester_info info){}
+// no check
+void _ADMIN_RENAME_CLIENT(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(check_session(src, requester_socket)) return;
+
+    size_t session_num = *src + '0';
+    char* client_text = strtok(NULL, ":");
+    size_t client_num = check_client_id(src, requester_socket);
+    if(client_num == gamer_capacity) return;
+
+    requester_info jackass;
+    jackass.client.is_guest = 0;
+    jackass.client.session_num = session_num;
+    jackass.client.id = client_num;
+
+    char* name = strtok(NULL, "");
+    if(!name){
+        write(requester_socket, MSG_NO_NAME, sizeof(MSG_NO_NAME));
+        return;
+    }
+
+    _SET_NAME(game, name, jackass);
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
+}
 
 // no check
 void _ADMIN_EXTERMINANTUS(game_server* game, char* src, requester_info info){
@@ -221,10 +268,10 @@ void _ADMIN_EXTERMINANTUS(game_server* game, char* src, requester_info info){
     _ADMIN_KICK_ALL_GUESTS(game, NULL, info);
 
     size_t i = max_sessions;
-    char buffer[] = "0";
+    char buffer[] = "0:d";
     while(i--){
         buffer[0] = '0' + i;
-        _ADMIN_KILL_SESSION(game, buffer, info);
+        _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game, buffer, info);
     }
 
     game->enough = 1;
@@ -233,7 +280,50 @@ void _ADMIN_EXTERMINANTUS(game_server* game, char* src, requester_info info){
 }
 
 // no ready
-void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){}
+void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){
+    int requester_socket = get_requester_socket(game, info);
+
+    if(info.guest.is_guest){
+        write(requester_socket, "Error: You not a gamer. Fuck you", sizeof("Error: You not a gamer. Fuck you"));
+        return;
+    }
+
+    session* party = game->sessions + info.client.session_num;
+
+    element* reagent1 = check_element(src, requester_socket, party->lib.worterbuch);
+    strtok(NULL, ":");
+    element* reagent2 = check_element(src, requester_socket, party->lib.worterbuch);
+
+    if(!(reagent1 && reagent2)) return;
+
+    element* rezult = dualisation(&party->lib, reagent1, reagent2, info.client.session_num);
+    if(rezult){
+        if(rezult->shortName.is_open == 0){
+            rezult->shortName.is_open = 1;
+
+            char buffer[1000] = "Party info: Gamer ";
+            strcat(buffer, *get_requester_name(game, info));
+            strcat(buffer, "open new combination:");
+            strcat(buffer, get_el_name(reagent1));
+            strcat(buffer, "+");
+            strcat(buffer, get_el_name(reagent2));
+            strcat(buffer, "=");
+            strcat(buffer, get_el_name(rezult));
+
+            size_t len = strlen(buffer)+1;
+
+            size_t i = party->gamer_count;
+            while(i--)
+                write(party->gamers[i].data.client_socket, buffer, len);
+        }
+        else{
+            char buffer[200] = "You received: ";
+            strcat(buffer, get_el_name(rezult));
+            write(requester_socket, buffer, strlen(buffer)+1);
+        }
+    }
+    else write(requester_socket, "You failed. Try Again.", sizeof("You failed. Try Again."));
+}
 
 // no check
 void _CREATE_SESSION(game_server* game, char* src, requester_info info){
