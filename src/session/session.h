@@ -23,9 +23,9 @@ typedef struct session{
 	client gamers[gamer_capacity];
 	fd_set readers;
 	char* path;
-	int16_t gamer_count;
-	int16_t session_id;
-	int16_t max_desc;
+	uint16_t gamer_count;
+	uint16_t session_id;
+	uint16_t max_desc;
 }session;
 
 typedef struct game_server{
@@ -40,13 +40,13 @@ typedef struct game_server{
 
 typedef union requester_info{
     struct{
-        int8_t is_guest:1;
-        int8_t num:7;
+        uint8_t is_guest:1;
+        uint8_t num:7;
     }guest;
     struct{
-        int8_t is_guest:1;
-        int8_t session_num:3;
-        int8_t id:4;
+        uint8_t is_guest:1;
+        uint8_t session_num:3;
+        uint8_t id:4;
     }client;
 } requester_info;
 
@@ -73,12 +73,16 @@ void print_guest(user* u, size_t lvl, char* buff);
 #define pgm(A,B,C) print_gamer(A,B,C)
 #define pgs(A,B,C) print_guest(A,B,C)
 
+#define fart(A) puts(A)
+
 #else
 
 #define psr(A, B)
 #define pss(A,B,C)
 #define pgm(A,B,C)
 #define pgs(A,B,C)
+
+#define fart(A)
 
 #endif
 

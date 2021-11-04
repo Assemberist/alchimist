@@ -36,10 +36,6 @@ int main(){
 
 #ifdef server_status
 	char debug_buffer[20000];
-
-	psr(&game, debug_buffer);
-	puts(debug_buffer);
-
 #endif
 
 	char reader[500];
@@ -69,6 +65,8 @@ int main(){
 								printf("socket %i closed\n", requester);
 								guest_leave(&game, i);
 								close(requester);
+								psr(&game, debug_buffer);
+								fart(debug_buffer);
 								break;
 							default:{
 								printf("new request from %i: %s\n", requester, reader);
@@ -76,6 +74,9 @@ int main(){
 								info.guest.is_guest = 1;
 								info.guest.num = i;
 								handle_request(&game, reader, info);
+
+								psr(&game, debug_buffer);
+								fart(debug_buffer);
 							}
 						}
 				}
@@ -102,6 +103,8 @@ int main(){
 									printf("gamer on socket %i closed\n", gomer);
 									gamer_leave(&game, j, i);
 									close(gomer);
+									psr(&game, debug_buffer);
+									fart(debug_buffer);
 									break;
 								default:{
 									printf("new request from %i: %s", gomer, reader);
@@ -110,6 +113,8 @@ int main(){
 									info.client.session_num = j;
 									info.client.id = i;
 									handle_request(&game, reader, info);
+									psr(&game, debug_buffer);
+									fart(debug_buffer);
 								}
 							}
 					}

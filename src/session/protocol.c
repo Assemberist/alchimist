@@ -328,10 +328,6 @@ void _CREATE_SESSION(game_server* game, char* src, requester_info info){
  
     char* force = strtok(NULL, ":");
 
-    requester_info to;
-    to.client.is_guest = 0;
-    to.client.id = 0;
-
     char* answer;
     size_t i;
 
@@ -374,6 +370,9 @@ found:
 connect:
 
     open_session(game, i, game->libraryes[lib]);
+    requester_info to;
+    to.client.is_guest = 0;
+    to.client.id = 0;
     to.client.session_num = i;
     move_client(game, info, to);
     answer = MSG_DONE;

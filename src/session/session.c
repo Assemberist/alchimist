@@ -44,17 +44,23 @@ void new_gamer(game_server* game, requester_info where, requester_info info){
     cli->data.login = *first_name;
     *first_name = NULL;
 
-    size_t client_sock = get_requester_socket(game, info);
+    size_t client_sock = get_requester_socket(game, where);
     cli->data.client_socket = client_sock;
     if(client_sock > ptr->max_desc) ptr->max_desc = client_sock+1;
     FD_SET(client_sock, &ptr->readers);
+    ptr->gamer_count++;
 
     cli->attempts = 0;
     cli->discover = 0;
 }
 
 void gamer_leave(game_server* game, size_t session_num, size_t id){
-	
+    session* ptr = game->sessions + session_num;
+    client* cli = ptr->gamers + id;
+    free(cli->data.login);
+    FD_CLR(cli->data.client_socket, &ptr->readers);
+    *cli = *(ptr->gamers + ptr->gamer_count - 1);
+    ptr->gamer_count--;
 }
 
 void open_session(game_server* game, size_t id, char* src){
@@ -114,6 +120,8 @@ void print_session(session* party, size_t lvl, char* buff){
         pgm(party->gamers + i, lvl+2, buff);
 
     strcat(buff, prefix);
+    strcat(buff, "\t}\n");
+    strcat(buff, prefix);
     strcat(buff, "}\n");
 }
 
@@ -121,14 +129,14 @@ void print_gamer(client* g, size_t lvl, char* buff){
     char prefix[10];
     for(prefix[lvl] = '\0'; lvl--; prefix[lvl] = '\t');
     buff += strlen(buff);
-    sprintf("%sclient { %s : %i  %i/%i }\n", prefix, g->data.login ? g->data.login : "Anonimus", g->data.client_socket, g->discover, g->attempts);
+    sprintf(buff, "%sclient { %s : %i  %i/%i }\n", prefix, g->data.login ? g->data.login : "Anonimus", g->data.client_socket, g->discover, g->attempts);
 }
 
 void print_guest(user* u, size_t lvl, char* buff){
     char prefix[10];
     for(prefix[lvl] = '\0'; lvl--; prefix[lvl] = '\t');
     buff += strlen(buff);
-    sprintf("%sguest { %s : %i }\n", prefix, u->login ? u->login : "Anonimus", u->client_socket);
+    sprintf(buff, "%sguest { %s : %i }\n", prefix, u->login ? u->login : "Anonimus", u->client_socket);
 }
 
 #endif
