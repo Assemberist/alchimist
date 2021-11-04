@@ -55,7 +55,31 @@ void open_session(game_server* game, size_t id, char* src);
 
 void new_guest(game_server* game, int sock);
 void guest_leave(game_server* game, size_t id);
-void new_gamer(game_server* game, size_t session_num, size_t id, requester_info info);
+void new_gamer(game_server* game, requester_info where, requester_info info);
 void gamer_leave(game_server* game, size_t session_num, size_t id);
+
+int get_requester_socket(game_server* game, requester_info info);
+char** get_requester_name(game_server* game, requester_info info);
+
+#ifdef server_status
+
+void print_server(game_server* game, char* buff);
+void print_session(session* party, size_t lvl, char* buff);
+void print_gamer(client* g, size_t lvl, char* buff);
+void print_guest(user* u, size_t lvl, char* buff);
+
+#define psr(A, B) print_server(A, B)
+#define pss(A,B,C) print_session(A,B,C)
+#define pgm(A,B,C) print_gamer(A,B,C)
+#define pgs(A,B,C) print_guest(A,B,C)
+
+#else
+
+#define psr(A, B)
+#define pss(A,B,C)
+#define pgm(A,B,C)
+#define pgs(A,B,C)
+
+#endif
 
 #endif

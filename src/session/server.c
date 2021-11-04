@@ -18,14 +18,14 @@ int main(){
 	new_game(&game);
 	game.libraryes = search_libs("/home/assemberist/source/alchimist/", &game.library_count);
 
+
     struct sockaddr_in serv_addr;
     memset(&serv_addr, '0', sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
     serv_addr.sin_port = htons(5000);
 	
-	int listener = socket(AF_INET, SOCK_STREAM, 0);
-	fcntl(listener, F_SETFL, O_NONBLOCK);
+	int listener = socket(AF_INET, SOCK_STREAM | O_NONBLOCK, 0);
     if(bind(listener, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1){
 		perror("cannot bind address");
 		return -1;
@@ -34,11 +34,20 @@ int main(){
 
 	struct timeval ts = {0,10000};
 
+#ifdef server_status
+	char debug_buffer[20000];
+
+	psr(&game, debug_buffer);
+	puts(debug_buffer);
+
+#endif
+
 	char reader[500];
 
 	while(!game.enough){
 		int tmp_sock;
 		if((tmp_sock = accept(listener, NULL, NULL)) != -1){
+			fcntl(tmp_sock, F_SETFL, O_NONBLOCK);
 			printf("One more connection on socket %i\n", tmp_sock);
 			new_guest(&game, tmp_sock);
 		}

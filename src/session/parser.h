@@ -13,6 +13,7 @@ typedef struct request_text{
 #define MSG_LARGE_NAME "Error: Too large name. Fuck you!"
 #define MSG_NO_NAME "Error: Name does not setted. Fuck you!"
 #define MSG_LEAVE "Get out from my game!"
+#define MSG_SESSION_BUSY "Error: session is busy. Fuck you!"
 #define MSG_NO_SESSION_ID "Error: session number does not setted. Fuck you!"
 #define MSG_WRONG_SESSION_ID "Error: Sessions can be from 0 to 7, you, moron! Fuck you!"
 #define MSG_WRONG_CLIENT_ID "Error: There is no that gay on server. Fuck you!"

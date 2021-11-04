@@ -25,7 +25,7 @@
 ]).
 
 initial(Sock) ->
-    Sock.
+    gen_tcp:send(Sock, construct_request([14,"/home/assemberist/source/alchimist/debug"])).
 
 one_request() ->
     {ok, Sock} = gen_tcp:connect(loopback, 5000, [{active, false}], 2000),

@@ -38,22 +38,6 @@ void handle_request(game_server* game, char* src, requester_info info){
     ptr->handler(game, strtok(NULL, ":"), info);
 }
 
-int get_requester_socket(game_server* game, requester_info info){
-    return (
-        info.guest.is_guest ? 
-            game->guests[info.guest.num].client_socket : 
-            game->sessions[info.client.session_num].gamers[info.client.id].data.client_socket
-    );
-}
-
-char** get_requester_name(game_server* game, requester_info info){
-    return (
-        info.guest.is_guest ? 
-            &game->guests[info.guest.num].login : 
-            &game->sessions[info.client.session_num].gamers[info.client.id].data.login
-    );
-}
-
 int check_session(char* src, int sock){
     if(!src)
         write(sock, MSG_NO_SESSION_ID, sizeof(MSG_NO_SESSION_ID));
@@ -81,7 +65,15 @@ size_t check_client_id(char* src, int sock){
 }
 
 void move_client(game_server* game, requester_info from, requester_info to){
+    if(game->sessions[to.client.session_num].gamer_count == gamer_capacity){
+        write(get_requester_socket(game, from), MSG_SESSION_BUSY, sizeof(MSG_SESSION_BUSY));
+        return;
+    }
 
+    new_gamer(game, from, to);
+
+    if(from.guest.is_guest) guest_leave(game, from.guest.num);
+    else gamer_leave(game, from.client.session_num, from.client.id);
 }
 
 element* check_element(char* src, int sock, token* worterbuch){
@@ -397,11 +389,11 @@ void _CONNECT_SESSION(game_server* game, char* src, requester_info info){
     if(!check_session(src, requester_socket)) return;
 
     if(game->sessions[*src - '0'].gamer_count == gamer_capacity){
-        write(requester_socket, "Error: session is busy", sizeof("Error: session is busy"));
+        write(requester_socket, MSG_SESSION_BUSY, sizeof(MSG_SESSION_BUSY));
         return;
     }
 
-    new_gamer(game, *src - '0', requester_socket, info);
+    //new_gamer(game, *src - '0', requester_socket, info);
     _LEAVE(game, NULL, info);
 
     write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
@@ -450,11 +442,9 @@ void _LIST_LIBRARYES(game_server* game, char* src, requester_info info){
 void _LIST_GAMERS(game_server* game, char* src, requester_info info){
     int requester_socket = get_requester_socket(game, info);
 
-    if(!src) 
-        write(requester_socket, MSG_NO_SESSION_ID, sizeof(MSG_NO_SESSION_ID));
-    else if(src[0] > '7' || src[0] < '0') 
-        write(requester_socket, MSG_WRONG_SESSION_ID, sizeof(MSG_WRONG_SESSION_ID));
-    else{
+    if(check_session(src, requester_socket)){
+        src[0] -= '0';
+
         char buffer[50] = "Gamers info:";
         char* ptr = buffer + sizeof("Gamers info:") - 1;
 
@@ -464,6 +454,7 @@ void _LIST_GAMERS(game_server* game, char* src, requester_info info){
             write(requester_socket, buffer, strlen(buffer)+1);
         }
     }
+
     write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
 }
 
@@ -512,13 +503,17 @@ void _LEAVE(game_server* game, char* src, requester_info info){
     strcpy(buffer, name ? name : "Anonimus");
     strcat(buffer, " leave the game");
 
+    write(requester_socket, MSG_LEAVE, sizeof(MSG_LEAVE));
+
     if(!info.guest.is_guest){
         gamer_leave(game, info.client.session_num, info.client.id);
         size_t i = game->sessions[info.client.session_num].gamer_count;
         while(i--)
             write(game->sessions[info.client.session_num].gamers[i].data.client_socket, buffer, strlen(buffer)+1);
     }
-    write(requester_socket, MSG_LEAVE, sizeof(MSG_LEAVE));
+    else guest_leave(game, info.guest.num);
+
+    close(requester_socket);
 }
 
 void _WRONG_REQUEST(game_server* game, char* src, requester_info info){

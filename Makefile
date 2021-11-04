@@ -1,7 +1,7 @@
 CORE = library.o loader.o string_tree.o
 
-debug: dbg := "-g"
-debug: corelib server tests list client
+debug: dbg :=-g -D debug -D server_status
+debug: server client
 
 build: dbg := 
 build: corelib server tests list
