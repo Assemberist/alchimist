@@ -40,9 +40,12 @@ void new_gamer(game_server* game, requester_info where, requester_info info){
     session* ptr = game->sessions + info.client.session_num;
     client* cli = ptr->gamers + info.client.id;
 
-    char** first_name = get_requester_name(game, where);
-    cli->data.login = *first_name;
-    *first_name = NULL;
+    char* first_name = *get_requester_name(game, where);
+    if(first_name){
+        cli->data.login = (char*)malloc(strlen(first_name)+1);
+        strcpy(cli->data.login, first_name);
+    }
+    else cli->data.login = NULL;
 
     size_t client_sock = get_requester_socket(game, where);
     cli->data.client_socket = client_sock;
