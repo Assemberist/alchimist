@@ -73,7 +73,7 @@ void move_client(game_server* game, requester_info from, requester_info to){
 
     if(from.client.is_guest == 0)
         if(from.client.session_num == to.client.session_num){
-            write(requester_socket, "You already here, Idiot!", sizeof("You already here, Idiot!"));
+            write(requester_socket, MSG_ALREADY_HERE, sizeof(MSG_ALREADY_HERE));
             return;
         }
 
@@ -85,7 +85,7 @@ void move_client(game_server* game, requester_info from, requester_info to){
 
 element* check_element(char* src, int sock, token* worterbuch){
     if(!src){
-        write(sock, "Error: Element is not setted. Fuck you!", sizeof("Error: Element is not setted. Fuck you!"));
+        write(sock, MSG_NO_ELEMENT, sizeof(MSG_NO_ELEMENT));
         return NULL;
     }
 
@@ -278,7 +278,7 @@ void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){
     int requester_socket = get_requester_socket(game, info);
 
     if(info.guest.is_guest){
-        write(requester_socket, "Error: You not a gamer. Fuck you", sizeof("Error: You not a gamer. Fuck you"));
+        write(requester_socket, MSG_YOU_GUEST, sizeof(MSG_YOU_GUEST));
         return;
     }
 
@@ -323,7 +323,7 @@ void _CREATE_SESSION(game_server* game, char* src, requester_info info){
     int requester_socket = get_requester_socket(game, info);
 
     if(!src){
-        write(requester_socket, "Error: Library required. Fuck you", sizeof(MSG_DONE));
+        write(requester_socket, "Error: Library required. Fuck you", sizeof("Error: Library required. Fuck you"));
         return;
     }
  
@@ -518,9 +518,9 @@ void _LIST_LOBBY(game_server* game, char* src, requester_info info){
 
 void _LEAVE(game_server* game, char* src, requester_info info){
     int requester_socket = get_requester_socket(game, info);
-    char buffer[100];
+    char buffer[150] = "Gamers info:";
     char* name = *get_requester_name(game, info);
-    strcpy(buffer, name ? name : "Anonimus");
+    strcpy(buffer + sizeof("Gamers info:")-1, name ? name : "Anonimus");
     strcat(buffer, " leave the game");
 
     if(!info.guest.is_guest){
