@@ -273,7 +273,6 @@ void _ADMIN_EXTERMINANTUS(game_server* game, char* src, requester_info info){
     write(requester_socket, MSG_EXTERMINATED, sizeof(MSG_EXTERMINATED));
 }
 
-// no ready
 void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){
     int requester_socket = get_requester_socket(game, info);
 
@@ -285,7 +284,7 @@ void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){
     session* party = game->sessions + info.client.session_num;
 
     element* reagent1 = check_element(src, requester_socket, party->lib.worterbuch);
-    strtok(NULL, ":");
+    src = strtok(NULL, ":");
     element* reagent2 = check_element(src, requester_socket, party->lib.worterbuch);
 
     if(!(reagent1 && reagent2)) return;
@@ -296,8 +295,9 @@ void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){
             rezult->shortName.is_open = 1;
 
             char buffer[1000] = "Party info: Gamer ";
-            strcat(buffer, *get_requester_name(game, info));
-            strcat(buffer, "open new combination:");
+            char* sas = *get_requester_name(game, info);
+            strcat(buffer, sas ? sas : "anonimus");
+            strcat(buffer, " open new combination:");
             strcat(buffer, get_el_name(reagent1));
             strcat(buffer, "+");
             strcat(buffer, get_el_name(reagent2));
@@ -305,8 +305,15 @@ void _SUMM_ELEMENTS(game_server* game, char* src, requester_info info){
             strcat(buffer, get_el_name(rezult));
 
             size_t len = strlen(buffer)+1;
-
             size_t i = party->gamer_count;
+            while(i--)
+                write(party->gamers[i].data.client_socket, buffer, len);
+
+            strcpy(buffer, "Element:");
+            strcat(buffer, get_el_name(rezult));
+
+            len = strlen(buffer)+1;
+            i = party->gamer_count;
             while(i--)
                 write(party->gamers[i].data.client_socket, buffer, len);
         }
@@ -376,6 +383,24 @@ connect:
     to.client.id = 0;
     to.client.session_num = i;
     move_client(game, info, to);
+    write(requester_socket, "Connected", sizeof("Connected"));
+
+    session* ptr = game->sessions + i;
+    char buffer[200] = "Element:";
+    char* str = buffer + sizeof("Element:")-1;
+    group* libr = ptr->lib.groups;
+    size_t gr = ptr->lib.group_count;
+    while(gr--){
+        size_t el = (libr + gr)->name_count;
+        while(el--){
+            element* elementus = ((libr + gr)->names + el);
+            if(elementus->shortName.is_open){
+                strcpy(str, get_el_name(elementus));
+                write(requester_socket, buffer, strlen(buffer) + 1);
+            }
+        }
+    }
+
     answer = MSG_DONE;
 
 exit:
@@ -403,6 +428,7 @@ void _CONNECT_SESSION(game_server* game, char* src, requester_info info){
     addr.client.is_guest = 0;
     addr.client.session_num = *src - '0';
 
+    write(requester_socket, "Connected", sizeof("Connected"));
     move_client(game, info, addr);
 
     char buffer[200] = "Element:";

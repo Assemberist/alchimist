@@ -1,6 +1,8 @@
+# debug levels: debug server_status
+
 CORE = library.o loader.o string_tree.o
 
-debug: dbg :=-g -D debug -D server_status
+debug: dbg :=-g -D debug
 debug: server client
 
 build: dbg := 

@@ -38,6 +38,10 @@ int main(){
 	char debug_buffer[20000];
 #endif
 
+#ifdef debug
+	char debug_buffer[20000];
+#endif
+
 	char reader[500];
 
 	while(!game.enough){

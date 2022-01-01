@@ -75,7 +75,18 @@ void print_guest(user* u, size_t lvl, char* buff);
 
 #define fart(A) puts(A)
 
-#else
+#endif
+
+#ifdef debug
+
+#define psr(A, B)
+#define pss(A,B,C)
+#define pgm(A,B,C)
+#define pgs(A,B,C)
+
+#define fart(A) puts(A)
+
+#else 
 
 #define psr(A, B)
 #define pss(A,B,C)
