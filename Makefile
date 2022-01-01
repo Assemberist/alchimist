@@ -12,7 +12,7 @@ corelib:
 	gcc -c src/core/*.c $(dbg) -fPIC
 	gcc -c src/service/*.c $(dbg)
 	gcc -shared -o libalch_core.so $(CORE) $(dbg)
-	mv *.o obj/
+	rm *.o
 
 server:
 	gcc -L. src/session/*.c -o game_server -lalch_core $(dbg)
