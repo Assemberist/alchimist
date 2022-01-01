@@ -17,10 +17,13 @@ typedef struct request_text{
 #define MSG_NO_SESSION_ID "Error: session number does not setted. Fuck you!"
 #define MSG_WRONG_SESSION_ID "Error: Sessions can be from 0 to 7, you, moron! Fuck you!"
 #define MSG_WRONG_CLIENT_ID "Error: There is no that gay on server. Fuck you!"
+#define MSG_ALREADY_HERE "Error: You already here, Idiot!"
+#define MSG_NO_ELEMENT "Error: Element is not setted. Fuck you!"
+#define MSG_YOU_GUEST "Error: You not a gamer. Fuck you"
 #define MSG_ADMIN_KILL "Admin: Go to gazenwagen!"
 #define MSG_ADMIN_RENAME "Admin: Your name now"
 #define MSG_SESSION_EXIST "Warn: There is same session: "
-#define MSG_EXTERMINATED "Holy Emperor, this world is exterminated. But what low cost is that tragedy for the humanity."
+#define MSG_EXTERMINATED "Warn: Holy Emperor, this world is exterminated. But what low cost is that tragedy for the humanity."
 #define MSG_DONE "Done"
 
 void _ADMIN_KICK_GUEST(game_server*, char*, requester_info);
