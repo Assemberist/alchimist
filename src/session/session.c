@@ -88,6 +88,11 @@ char** get_requester_name(game_server* game, requester_info info){
     );
 }
 
+void delete_session(session* s){
+	dispose_library(&s->lib);
+	free(s->path);
+}
+
 #ifdef server_status
 
 void print_server(game_server* game, char* buff){

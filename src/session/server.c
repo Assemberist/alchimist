@@ -128,6 +128,11 @@ int main(){
 		usleep(20);
 	}
 
+	size_t i = max_sessions;
+	while(i--)
+		if(game.sessions[i].path)
+			delete_session(game.sessions + i);
+
 	while (game.library_count--)
 		free(game.libraryes[game.library_count]);
 	free(game.libraryes);

@@ -58,6 +58,8 @@ void guest_leave(game_server* game, size_t id);
 void new_gamer(game_server* game, requester_info where, requester_info info);
 void gamer_leave(game_server* game, size_t session_num, size_t id);
 
+void delete_session(session* s);
+
 int get_requester_socket(game_server* game, requester_info info);
 char** get_requester_name(game_server* game, requester_info info);
 
