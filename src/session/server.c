@@ -16,7 +16,7 @@
 int main(){
 	game_server game;
 	new_game(&game);
-	game.libraryes = search_libs("/home/assemberist/source/alchimist/", &game.library_count);
+	game.libraryes = search_libs("./", &game.library_count);
 
 
     struct sockaddr_in serv_addr;
@@ -125,6 +125,7 @@ int main(){
 				}
 			}
 		}
+		usleep(20);
 	}
 
 	while (game.library_count--)

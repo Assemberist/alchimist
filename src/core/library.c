@@ -35,7 +35,7 @@ char* get_el_name(element* ptr){
 	return (ptr->shortName.is_long ? ptr->longName.name : ptr->shortName.name);
 }
 
-void parse_lib(char* src, void* el, void*){
+void parse_lib(char* src, void* el, void* _arg){
 	size_t len = strlen(src);
 	*((char**)el) = malloc(len);
 	strcpy(*(char**)el, src);

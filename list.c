@@ -1,7 +1,7 @@
 #include "src/core/loader.h"
 
 int main(){
-	library lib = load_library("/home/assemberist/source/alchimist/debug");
+	library lib = load_library("./debug");
 	for(size_t i = lib.group_count; i--;){
 		for(size_t j = lib.groups[i].name_count; j--;){
 			char* src = get_el_name(lib.groups[i].names + j);
