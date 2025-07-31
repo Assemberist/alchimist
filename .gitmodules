@@ -1,0 +1,6 @@
+[submodule "submod/string_tree"]
+	path = submod/string_tree
+	url = https://github.com/assemberist/string_tree
+[submodule "submod/dirent"]
+	path = submod/dirent
+	url = https://github.com/tronkko/dirent
