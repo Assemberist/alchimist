@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "../service/string_tree.h"
+#include "../submod/string_tree/src/string_tree.h"
 
 typedef union element{
 	struct{
