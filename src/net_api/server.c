@@ -1,6 +1,7 @@
 #include "session.h"
 #include <stddef.h>
 
+/*
 #include <stdint.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -13,7 +14,7 @@
 #include <stdint.h>
 #include "protocol.h"
 
-int main(){
+int servak(){
 	game_server game;
 	new_game(&game);
 	game.libraryes = search_libs("./", &game.library_count);
@@ -24,7 +25,7 @@ int main(){
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
     serv_addr.sin_port = htons(5000);
-	
+
 	int listener = socket(AF_INET, SOCK_STREAM | O_NONBLOCK, 0);
     if(bind(listener, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1){
 		perror("cannot bind address");
@@ -139,3 +140,5 @@ int main(){
 
 	return 0;
 }
+
+*/

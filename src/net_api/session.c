@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
 void new_game(game_server* game){
     game->guest_count = 0;
     FD_ZERO(&game->lobby);
@@ -74,16 +75,16 @@ void open_session(game_server* game, size_t id, char* src){
 
 int get_requester_socket(game_server* game, requester_info info){
     return (
-        info.guest.is_guest ? 
-            game->guests[info.guest.num].client_socket : 
+        info.guest.is_guest ?
+            game->guests[info.guest.num].client_socket :
             game->sessions[info.client.session_num].gamers[info.client.id].data.client_socket
     );
 }
 
 char** get_requester_name(game_server* game, requester_info info){
     return (
-        info.guest.is_guest ? 
-            &game->guests[info.guest.num].login : 
+        info.guest.is_guest ?
+            &game->guests[info.guest.num].login :
             &game->sessions[info.client.session_num].gamers[info.client.id].data.login
     );
 }
@@ -124,7 +125,7 @@ void print_session(session* party, size_t lvl, char* buff){
     sprintf(buff, "%ssession %i {\n%s\tlibrary = %s\n\t%sgamers {\n",
         prefix, party->session_id, prefix, party->path, prefix);
 
-    for(i=0; i<party->gamer_count; i++) 
+    for(i=0; i<party->gamer_count; i++)
         pgm(party->gamers + i, lvl+2, buff);
 
     strcat(buff, prefix);
@@ -148,3 +149,5 @@ void print_guest(user* u, size_t lvl, char* buff){
 }
 
 #endif
+
+*/

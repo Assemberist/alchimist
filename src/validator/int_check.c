@@ -15,7 +15,7 @@ int (*tests[])(library*) = {
 void init(element_ext* el){ if(el) el->shortName.initial_value = el->shortName.is_open; }
 void reset(element_ext* el){ if(el) el->shortName.is_open = el->shortName.initial_value; }
 
-int main(int argc, char** argv){
+/*int main(int argc, char** argv){
 	if(argc != 2){
 		puts("Incorrect amount of args");
 		return -1;
@@ -39,4 +39,4 @@ int main(int argc, char** argv){
 
 	puts("All tests completed");
 	return 0;
-}
+}*/

@@ -5,7 +5,7 @@
 #include <string.h>
 
 typedef struct request_text{
-    void (*handler)(game_server*, char*, requester_info);
+    //void (*handler)(game_server*, char*, requester_info);
     char* text;
 }request_text;
 
@@ -26,6 +26,7 @@ typedef struct request_text{
 #define MSG_EXTERMINATED "Warn: Holy Emperor, this world is exterminated. But what low cost is that tragedy for the humanity."
 #define MSG_DONE "Done"
 
+/*
 void _ADMIN_KICK_GUEST(game_server*, char*, requester_info);
 void _ADMIN_KICK_ALL_GUESTS(game_server*, char*, requester_info);
 void _ADMIN_RENAME_GUEST(game_server*, char*, requester_info);
@@ -44,5 +45,7 @@ void _CREATE_SESSION(game_server*, char*, requester_info);
 void _SUMM_ELEMENTS(game_server*, char*, requester_info);
 void _LEAVE(game_server*, char*, requester_info);
 void _WRONG_REQUEST(game_server*, char*, requester_info);
+
+*/
 
 #endif

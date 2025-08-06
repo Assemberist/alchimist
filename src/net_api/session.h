@@ -1,7 +1,7 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-#include "../core/loader.h"
+/*#include "../core/loader.h"
 
 #define gamer_capacity 16
 #define max_sessions 7
@@ -88,7 +88,7 @@ void print_guest(user* u, size_t lvl, char* buff);
 
 #define fart(A) puts(A)
 
-#else 
+#else
 
 #define psr(A, B)
 #define pss(A,B,C)
@@ -98,5 +98,7 @@ void print_guest(user* u, size_t lvl, char* buff);
 #define fart(A)
 
 #endif
+
+*/
 
 #endif

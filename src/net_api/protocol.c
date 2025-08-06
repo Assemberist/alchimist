@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-request_text request_handlers[] = {
+/*request_text request_handlers[] = {
     {_ADMIN_KICK_GUEST, "I command to kick this guest"},
     {_ADMIN_KICK_ALL_GUESTS, "I command to kick all guests"},
     {_ADMIN_RENAME_GUEST, "I command to name he as"},
@@ -41,7 +41,7 @@ void handle_request(game_server* game, char* src, requester_info info){
 int check_session(char* src, int sock){
     if(!src)
         write(sock, MSG_NO_SESSION_ID, sizeof(MSG_NO_SESSION_ID));
-    else if(src[0] > '7' || src[0] < '0') 
+    else if(src[0] > '7' || src[0] < '0')
         write(sock, MSG_WRONG_SESSION_ID, sizeof(MSG_WRONG_SESSION_ID));
     else return 1;
 
@@ -185,7 +185,7 @@ void _ADMIN_KICK_CLIENT(game_server* game, char* src, requester_info info){
     write(get_requester_socket(game, jackass), MSG_ADMIN_KILL, sizeof(MSG_ADMIN_KILL));
     _LEAVE(game, NULL, jackass);
 
-    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
 }
 
 // no check
@@ -214,7 +214,7 @@ void _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game_server* game, char* src, requeste
         session_ptr->max_desc = 0;
     }
 
-    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
 }
 
 // no check
@@ -228,7 +228,7 @@ void _ADMIN_KICK_ALL_CLIENTS_FROM_SERVER(game_server* game, char* src, requester
         _ADMIN_KICK_ALL_CLIENTS_FROM_SESSION(game, buffer, info);
     }
 
-    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));    
+    write(requester_socket, MSG_DONE, sizeof(MSG_DONE));
 }
 
 void _ADMIN_RENAME_CLIENT(game_server* game, char* src, requester_info info){
@@ -333,7 +333,7 @@ void _CREATE_SESSION(game_server* game, char* src, requester_info info){
         write(requester_socket, "Error: Library required. Fuck you", sizeof("Error: Library required. Fuck you"));
         return;
     }
- 
+
     char* force = strtok(NULL, ":");
 
     char* answer;
@@ -519,7 +519,7 @@ void _SET_NAME(game_server* game, char* src, requester_info info){
             if(*name) free(*name);
             *name = (char*)malloc(len+1);
             strcpy(*name, src);
-            
+
             strcpy(buffer, "Hello: ");
             strcat(buffer, src);
             answer = buffer;
@@ -567,3 +567,5 @@ void _WRONG_REQUEST(game_server* game, char* src, requester_info info){
     int requester_socket = get_requester_socket(game, info);
     write(requester_socket, MSG_WRONG_REQUEST, sizeof(MSG_WRONG_REQUEST));
 }
+
+*/

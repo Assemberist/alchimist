@@ -4,7 +4,13 @@
 #include "library.h"
 #include <dirent.h>
 #include <unistd.h>
+
+#ifdef __linux__
 #include <linux/limits.h>
+
+#elifdef _WIN32
+
+#endif
 
 #include <string.h>
 
