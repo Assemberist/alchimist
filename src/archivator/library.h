@@ -4,8 +4,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "../submod/string_tree/src/string_tree.h"
+
+#include <stddef.h>
+#include <stddef.h>
+
+#include <dirent.h>
+#include <unistd.h>
+
+#ifdef __linux__
+#include <linux/limits.h>
+
+#elifdef _WIN32
+
+#endif
 
 typedef struct element{
 	char* name;
@@ -29,10 +43,10 @@ typedef struct library{
 	size_t recept_count;
 	group* groups;
 	size_t group_count;
-	token* worterbuch;
 } library;
 
-void* read_file(char* path, void(*parser)(char*, void*, void*), size_t element_size, void* args, size_t* rows);
+library load_library(char* path);
+token* wordbook_from_library(library* lib);
 void dispose_library(library* lib);
 
 #endif
