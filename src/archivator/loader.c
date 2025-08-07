@@ -1,4 +1,4 @@
-#include "../core/loader.h"
+#include "loader.h"
 #include <stddef.h>
 
 void create_element(char* src, void* el, void* args){
