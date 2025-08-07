@@ -64,13 +64,15 @@ library load_groups(char* path){
 	while(lib.group_count < file_count){
 		f_cur = readdir(dir);
         char* file_name = f_cur->d_name;
+        size_t len = strlen(file_name);
 		if(file_name[0] != '.'){
             sprintf(group_name, "%s%s%s", path, "/groups/", file_name);
 
 			group g;
 			g.names = read_file(group_name, create_element, sizeof(element), NULL, &g.name_count);
-			g.name = (char*)malloc(strlen(file_name) - 4);
-			strncpy(g.name, file_name, strlen(file_name) - 4);
+			g.name = (char*)malloc(len - 3);
+			strncpy(g.name, file_name, len - 4);
+			g.name[len-4] = '\0';
 
 			lib.groups[lib.group_count] = g;
 			lib.group_count++;
