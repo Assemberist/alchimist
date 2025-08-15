@@ -1,6 +1,7 @@
 %{
 #include "syntax.tab.h"
 #include "string_tree.h"
+#include "parser.h"
 
 extern phase Phase;
 extern token* wordbook;
@@ -8,6 +9,8 @@ extern token* wordbook;
 static size_t ids = 0;
 
 %}
+
+%option noyywrap
 
 %%
 
@@ -27,7 +30,7 @@ static size_t ids = 0;
 
 					lbl_word:
 						if(Phase == PHASE3) {
-							yylval.id = get_value(wordbook, yytext);
+							yylval.id = (size_t)get_value(yytext, wordbook);
 							return ID;
 						}
 						else {
@@ -36,6 +39,6 @@ static size_t ids = 0;
 						}
 					}
 
-[:alnum: ]+\0		{ set_value(wordbook, yytext, ids++); return WORD_P2; }
+[:alnum: ]+\0		{ set_value(yytext, (void*)ids++, wordbook); return WORD_P2; }
 
 %%
