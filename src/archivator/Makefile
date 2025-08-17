@@ -1,17 +1,21 @@
-parser.exe: syntax.tab.c \
+parser: syntax.tab.c \
 			lex.yy.c \
-			$(wilcard *.h) \
-			$(wilcard *.c)
-	g++ *.c -o parser.exe
+			$(wildcard *.h) \
+			$(wildcard *.c) \
+			string_tree.o
+	gcc *.c string_tree.o -o parser -g
+
+string_tree.o: string_tree/string_tree.c string_tree/string_tree.h
+	gcc -c string_tree/string_tree.c -o $@
 
 syntax.tab.c: syntax.y
-	win_bison.exe -d syntax.y
+	bison -d syntax.y
 
-lex.yy.c: lexic.lex
-	win_flex.exe lexic.lex
+lex.yy.c: lexic.l
+	flex lexic.l
 
 clean:
-	del parser.exe
-	del syntax.tab.c
-	del syntax.tab.h
-	del lex.yy.c
+	rm 	parser \
+		syntax.tab.c \
+		syntax.tab.h \
+		lex.yy.c

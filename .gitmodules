@@ -1,6 +1,3 @@
-[submodule "src/submod/dirent"]
-	path = src/submod/dirent
-	url = https://github.com/tronkko/dirent
 [submodule "src/submod/string_tree"]
 	path = src/submod/string_tree
 	url = https://github.com/assemberist/string_tree

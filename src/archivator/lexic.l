@@ -1,6 +1,6 @@
 %{
+
 #include "syntax.tab.h"
-#include "string_tree.h"
 #include "parser.h"
 
 extern phase Phase;

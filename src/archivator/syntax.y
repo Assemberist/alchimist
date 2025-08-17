@@ -1,8 +1,6 @@
 %{
 
 #include <dirent.h>
-#include <stdint.h>
-#include "string_tree.h"
 #include "parser.h"
 
 extern void yyrestart(FILE*);
@@ -40,8 +38,7 @@ size_t group_name_ptr = 0;
 
 FILE* binary;
 
-void new_element(char* el);
-void new_open_element(char* el);
+void new_element(int is_open, char* el);
 
 // Phase 2
 
