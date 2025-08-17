@@ -18,7 +18,8 @@ clean: cleanArchive
 	rm 	parser \
 		syntax.tab.c \
 		syntax.tab.h \
-		lex.yy.c
+		lex.yy.c \
+		string_tree.o
 
 cleanArchive:
 	rm 	binary.dat \

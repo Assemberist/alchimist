@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 	//
 	// <group>/*.txt -> groups.txt		|| group names
 	// 				 -> elements.txt	|| element names
-	//				 -> binary.dat	|| element data
+	//				 -> binary.dat		|| element data
 	//
 	////////////////////////////////
 
@@ -98,8 +98,6 @@ int main(int argc, char* argv[]) {
 
 			if (strstr(ent->d_name, ".txt")){
 				sprintf(buffer, "%s/%s", group_path, ent->d_name);
-				puts("\n\n");
-				puts(buffer);
 
 				FILE* reader = fopen(buffer, "r");
                 if(reader){
@@ -107,7 +105,7 @@ int main(int argc, char* argv[]) {
 					yyparse();
 					fclose(reader);
 
-					// cut off extention
+					// get file name w/o ext.
 					strcpy(buffer, ent->d_name);
 					strtok(buffer, ".");
 
@@ -195,12 +193,35 @@ int main(int argc, char* argv[]) {
 	qsort(combo, combination_counter, sizeof(combination_t), cmp);
 
 	if(binary = fopen("binary.dat", "a")){
-	fwrite(combo, sizeof(combination_t), combination_counter, binary);
-
+		fwrite(combo, sizeof(combination_t), combination_counter, binary);
 	} else {
         perror("can't open bin data");
         return 1;
     }
+
+	////////////////////////////////
+	//
+	// Phase 4: concat data to archive
+	//
+	// metadata
+	// 		2b: amount of elements 
+	//		2b: amount of combinations
+	//		4b: start of group names
+	//		4b: start of element names
+	// elements
+	// combinations
+	// wordbook
+	// group names
+	// element names
+	//
+	////////////////////////////////
+
+
+	////////////////////////////////
+	//
+	// Cleanup
+	//
+	////////////////////////////////
 
 	if(argc == 3)
 		free(combi_path);
