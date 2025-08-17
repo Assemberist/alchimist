@@ -27,6 +27,11 @@ typedef struct {
 	uint16_t idResult;
 } combination_t;
 
+// Prepare
+
+char* get_combi_path(char* path);
+char* get_group_path(char* path);
+
 // Phase 1
 
 FILE* elem_txt;
@@ -51,6 +56,12 @@ combination_t* combiArray;
 
 int cmp(const void* val1, const void* val2);
 void new_combo(size_t reagent1, size_t reagent2, size_t result);
+
+////////////////////////////////
+//
+// Main
+//
+////////////////////////////////
 
 int main(int argc, char* argv[]) {
 	char* group_path;
@@ -133,9 +144,9 @@ int main(int argc, char* argv[]) {
 	//
 	// Phase 2: make string_tree
 	//
-	// 	elements.txt | -> string_tree =
-	//	elements.dat |		#{ char* => size_t }
+	// 	elements.txt -> string_tree
 	//
+	//  string_tree is map #{ char* => size_t }
 	//
 	////////////////////////////////
 
@@ -255,7 +266,26 @@ void new_combo(size_t reagent1, size_t reagent2, size_t result){
 	combination_counter++;
 }
 
+char* get_combi_path(char* path){
+    char* ptr = (char*)malloc(strlen(path)+strlen("/combinations.txt")+1);
+    sprintf(ptr, "%s%s", path, "/combinations.txt");
+    return ptr;
+}
+
+char* get_group_path(char* path){
+    char* ptr = (char*)malloc(strlen(path)+strlen("/groups")+1);
+    sprintf(ptr, "%s%s", path, "/groups");
+    puts(ptr);
+    return ptr;
+}
+
 %}
+
+////////////////////////////////
+//
+// Bison part
+//
+////////////////////////////////
 
 %union {
 	char* str;
@@ -273,7 +303,7 @@ parse: phase1
 	 | phase2
 	 | phase3
 
-// groups part
+
 
 phase1: if_spaces elements if_spaces END
 
@@ -283,17 +313,14 @@ elements: element
 element: WORD_P1 { new_element(0, $1); }
 	   | OPEN if_spaces WORD_P1 { new_element(1, $3); }
 
-if_spaces:
-		 | SPACE
 
-// create string_tree (local)
 
 phase2: words END
 
 words: WORD_P2
 	 | words WORD_P2
 
-// combinations part
+
 
 phase3: if_spaces combinations if_spaces END
 
@@ -302,5 +329,10 @@ combinations: combination
 
 combination: ID if_spaces PLUS if_spaces ID if_spaces EQ if_spaces ID { new_combo($1, $5, $9); }
 		   | ID if_spaces EQ if_spaces ID if_spaces PLUS if_spaces ID { new_combo($9, $5, $1); }
+
+
+
+if_spaces:
+		 | SPACE
 
 %%

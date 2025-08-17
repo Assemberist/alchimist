@@ -11,6 +11,3 @@ typedef enum {
     PHASE2,
     PHASE3
 } phase;
-
-char* get_combi_path(char* path);
-char* get_group_path(char* path);
