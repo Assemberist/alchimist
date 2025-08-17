@@ -22,9 +22,10 @@ static size_t ids = 0;
 
 <<EOF>>				return END;
 
-[:alnum:]+			goto lbl_word;
+[[:alnum:]]+			goto lbl_word;
 
-\{[:alnum: ]+\}		{
+
+\{[[:alnum:] ]+\}		{
 						yytext++;
 						yytext[strlen(yytext)-1] = '\0';
 
@@ -39,6 +40,6 @@ static size_t ids = 0;
 						}
 					}
 
-[:alnum: ]+\0		{ set_value(yytext, (void*)ids++, wordbook); return WORD_P2; }
+[[:alnum:] ]+\0		{ set_value(yytext, (void*)ids++, wordbook); return WORD_P2; }
 
 %%

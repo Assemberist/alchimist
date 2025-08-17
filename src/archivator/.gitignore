@@ -2,5 +2,10 @@ syntax.tab.c
 syntax.tab.h
 lex.yy.c
 string_tree.o
+
 parser
 parser.exe
+
+binary.dat
+elements.txt
+groups.txt

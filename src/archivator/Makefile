@@ -14,8 +14,13 @@ syntax.tab.c: syntax.y
 lex.yy.c: lexic.l
 	flex lexic.l
 
-clean:
+clean: cleanArchive
 	rm 	parser \
 		syntax.tab.c \
 		syntax.tab.h \
 		lex.yy.c
+
+cleanArchive:
+	rm 	binary.dat \
+		elements.txt \
+		groups.txt

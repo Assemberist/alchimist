@@ -97,22 +97,23 @@ int main(int argc, char* argv[]) {
 				continue;
 
 			if (strstr(ent->d_name, ".txt")){
+				sprintf(buffer, "%s/%s", group_path, ent->d_name);
+				puts("\n\n");
+				puts(buffer);
 
-				FILE* reader = fopen(ent->d_name, "r");
+				FILE* reader = fopen(buffer, "r");
                 if(reader){
 					yyrestart(reader);
 					yyparse();
 					fclose(reader);
 
-					// write group to groups.txt
-					// cut off path and extention
+					// cut off extention
 					strcpy(buffer, ent->d_name);
-					char *ptr, *start = strtok(buffer, "/");
-					while(ptr = strtok(NULL, "/")) start = ptr;
-					strtok(start, ".");
+					strtok(buffer, ".");
 
-					fprintf(groups, "%s\0", start);
-					group_name_ptr += strlen(start)+1;
+					fprintf(groups, "%s", buffer);
+					putc('\0', groups);
+					group_name_ptr += strlen(buffer)+1;
 				}
 				else fprintf(stderr, "Can't open %s\n", ent->d_name);
             }
@@ -194,6 +195,7 @@ int main(int argc, char* argv[]) {
 	qsort(combo, combination_counter, sizeof(combination_t), cmp);
 
 	if(binary = fopen("binary.dat", "a")){
+	fwrite(combo, sizeof(combination_t), combination_counter, binary);
 
 	} else {
         perror("can't open bin data");
@@ -209,7 +211,8 @@ void new_element(int is_open, char* el){
 	fwrite(&elem, sizeof(element_t), 1, binary);
 	elem_counter++;
 
-	fprintf(elem_txt, "%s\0", el);
+	fprintf(elem_txt, "%s", el);
+	putc('\0', elem_txt);
 	elem_name_ptr += strlen(el) + 1;
 }
 
