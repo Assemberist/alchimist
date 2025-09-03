@@ -1,3 +1,5 @@
 [submodule "src/submod/string_tree"]
+	update = merge
+	branch = master
 	path = src/submod/string_tree
 	url = https://github.com/assemberist/string_tree

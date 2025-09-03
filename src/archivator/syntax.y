@@ -245,24 +245,27 @@ int main(int argc, char* argv[]) {
 	FILE* output = fopen("library.alch2", "w");
 
 	if(output){
-		fwrite((uint16_t)elem_counter, sizeof(uint16_t), 1, output);
-		fwrite((uint16_t)combination_counter, sizeof(uint16_t), 1, output);
+		uint16_t val16 = elem_counter;
+		fwrite(&val16, sizeof(uint16_t), 1, output);
+		val16 = combination_counter;
+		fwrite(&val16, sizeof(uint16_t), 1, output);
 
 		// pack tree and check how much space it takes
+		uint32_t val32 = group_name_ptr;
+		fwrite(&val32, sizeof(uint32_t), 1, output);
+		val32 = elem_name_ptr;
+		fwrite(&val32, sizeof(uint32_t), 1, output);
 
-		fwrite((uint32_t)group_name_ptr /* + shiht */, sizeof(uint32_t), 1, output);
-		fwrite((uint32_t)elem_name_ptr /* + shift */, sizeof(uint32_t), 1, output);
 
 		sprintf(buf, "%s binary.dat >> library.alch2", cat_tool);
-		system(buf);
+		remove("binary.dat");
 
 		// write wordbook
 
 		sprintf(buf, "%s groups.txt >> library.alch2", cat_tool);
-		system(buf);
-
+		remove("groups.txt");
 		sprintf(buf, "%s elements.txt >> library.alch2", cat_tool);
-		system(buf);
+		remove("elements.txt");
 
 	} else {
         perror("can't open bin data");

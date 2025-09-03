@@ -1,12 +1,14 @@
-parser: syntax.tab.c \
-			lex.yy.c \
-			$(wildcard *.h) \
-			$(wildcard *.c) \
-			string_tree.o
-	gcc *.c string_tree.o -o parser -g
+parser: $(wildcard *.h) \
+		$(wildcard *.c) \
+		wb.o
+	gcc *.c wb.o -o parser -g
 
-string_tree.o: string_tree/string_tree.c string_tree/string_tree.h
-	gcc -c string_tree/string_tree.c -o $@
+wb.o: string_tree/wb.o
+	cp $< $@
+
+string_tree/wb.o: $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
+	cd string_tree && make
+
 
 syntax.tab.c: syntax.y
 	bison -d syntax.y
@@ -14,14 +16,16 @@ syntax.tab.c: syntax.y
 lex.yy.c: lexic.l
 	flex lexic.l
 
+
 clean: cleanArchive
 	rm 	parser \
 		syntax.tab.c \
 		syntax.tab.h \
 		lex.yy.c \
-		string_tree.o
+		wb.o
 
 cleanArchive:
 	rm 	binary.dat \
 		elements.txt \
-		groups.txt
+		groups.txt \
+		library.alch2

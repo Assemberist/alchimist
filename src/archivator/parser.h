@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "../submod/string_tree/src/string_tree.h"
+#include "string_tree/string_tree.h"
 
 typedef enum {
     PHASE1,

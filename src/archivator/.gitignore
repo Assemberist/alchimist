@@ -1,7 +1,7 @@
 syntax.tab.c
 syntax.tab.h
 lex.yy.c
-string_tree.o
+*.o
 
 parser
 parser.exe
@@ -9,3 +9,5 @@ parser.exe
 binary.dat
 elements.txt
 groups.txt
+
+library.alch2
