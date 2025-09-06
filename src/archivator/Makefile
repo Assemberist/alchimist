@@ -6,7 +6,7 @@ parser: $(wildcard *.h) \
 wb.o: string_tree/wb.o
 	cp $< $@
 
-string_tree/wb.o: $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
+string_tree/wb.o: syntax.tab.c lex.yy.c $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
 	cd string_tree && make
 
 
@@ -17,14 +17,13 @@ lex.yy.c: lexic.l
 	flex lexic.l
 
 
-clean: cleanArchive
+clean:
+	cd string_tree && make clean
 	rm 	parser \
 		syntax.tab.c \
 		syntax.tab.h \
 		lex.yy.c \
 		wb.o
-
-cleanArchive:
 	rm 	binary.dat \
 		elements.txt \
 		groups.txt \

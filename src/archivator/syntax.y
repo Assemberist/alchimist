@@ -48,6 +48,7 @@ void new_element(int is_open, char* el);
 // Phase 2
 
 token* wordbook;
+pack package;
 
 // Phase 3
 
@@ -57,20 +58,9 @@ combination_t* combiArray;
 int cmp(const void* val1, const void* val2);
 void new_combo(size_t reagent1, size_t reagent2, size_t result);
 
-// Tools
+// Phase 4
 
-#ifdef _WIN32
-	#define cat_tool "test"
-	#define del_tool "del"
-
-#elif defined __linux__
-	#define cat_tool "cat"
-	#define del_tool "rm"
-
-#else
-	#error "Custom error: Not supported OS"
-
-#endif
+void catFile(char* source, FILE* destination);
 
 ////////////////////////////////
 //
@@ -110,75 +100,87 @@ int main(int argc, char* argv[]) {
 
 	Phase = PHASE1;
 
-    DIR* dir;
-    struct dirent* ent;
-    if (dir = opendir(group_path)) {
-		FILE* groups = fopen("groups.txt", "w");
-		elem_txt = fopen("elements.txt", "w");
-		binary = fopen("binary.dat", "w");
+	{
+		DIR* dir;
+		struct dirent* ent;
+		if (dir = opendir(group_path)) {
+			FILE* groups = fopen("groups.txt", "w");
+			elem_txt = fopen("elements.txt", "w");
+			binary = fopen("binary.dat", "w");
 
-		char buffer[256];
-        while (ent = readdir(dir)) {
-            if (ent->d_name[0] == '.')
-				continue;
+			char buffer[256];
+			while (ent = readdir(dir)) {
+				if (ent->d_name[0] == '.')
+					continue;
 
-			if (strstr(ent->d_name, ".txt")){
-				sprintf(buffer, "%s/%s", group_path, ent->d_name);
+				if (strstr(ent->d_name, ".txt")){
+					sprintf(buffer, "%s/%s", group_path, ent->d_name);
 
-				FILE* reader = fopen(buffer, "r");
-                if(reader){
-					yyrestart(reader);
-					yyparse();
-					fclose(reader);
+					FILE* reader = fopen(buffer, "r");
+					if(reader){
+						yyrestart(reader);
+						yyparse();
+						fclose(reader);
 
-					// get file name w/o ext.
-					strcpy(buffer, ent->d_name);
-					strtok(buffer, ".");
+						// get file name w/o ext.
+						strcpy(buffer, ent->d_name);
+						strtok(buffer, ".");
 
-					fprintf(groups, "%s", buffer);
-					putc('\0', groups);
-					group_name_ptr += strlen(buffer)+1;
+						fprintf(groups, "%s", buffer);
+						putc('\0', groups);
+						group_name_ptr += strlen(buffer)+1;
+					}
+					else fprintf(stderr, "Can't open %s\n", ent->d_name);
 				}
-				else fprintf(stderr, "Can't open %s\n", ent->d_name);
-            }
-        }
+			}
 
-		fclose(groups);
-		fclose(elem_txt);
-		fclose(binary);
+			fclose(groups);
+			fclose(elem_txt);
+			fclose(binary);
 
-		free(group_path);
-        closedir(dir);
+			free(group_path);
+			closedir(dir);
 
-    } else {
-        perror("could not open directory");
-        return 1;
-    }
+		} else {
+			perror("could not open directory");
+			return 1;
+		}
+	}
 
 	////////////////////////////////
 	//
 	// Phase 2: make string_tree
 	//
-	// 	elements.txt -> string_tree
+	//  1) create string_tree
+	//  2) fill string_tree from elements.txt
+	//  3) Compress tree
 	//
-	//  string_tree is map #{ char* => size_t }
+	//  elements.txt -> string_tree -> pack
 	//
 	////////////////////////////////
 
 	Phase = PHASE2;
 
-	wordbook = init_tree();
+	{
+		wordbook = init_tree();
 
-	FILE* words = fopen("elements.txt", "r");
-	if(words){
-		yyrestart(words);
-		yyparse();
-		fclose(words);
-	} else {
-        perror("can't open elemnts (phase 2)");
-        return 1;
-    }
+		FILE* words = fopen("elements.txt", "r");
+		if(words){
+			yyrestart(words);
+			yyparse();
+			fclose(words);
+		} else {
+			perror("can't open elemnts (phase 2)");
+			return 1;
+		}
+		package = pack_tree(wordbook);
+		remove_tree(wordbook);
 
+		// WA for NULL values
+		for(int i = 0; i < package.info.nodes; i++)
+			if(package.values[i] == (void*)UINT64MAX)
+				package.values[i] = 0;
+	}
 
 	////////////////////////////////
 	//
@@ -192,38 +194,40 @@ int main(int argc, char* argv[]) {
 
 	Phase = PHASE3;
 
-	FILE *combinations = fopen(combi_path, "r");
+	{
+		FILE *combinations = fopen(combi_path, "r");
 
-    if (!combinations) {
-        perror("can't open combinations");
-        return 1;
-    }
+		if (!combinations) {
+			perror("can't open combinations");
+			return 1;
+		}
 
-    char buf[4096];
+		char buf[4096];
 
-    while (fgets(buf, sizeof(buf), combinations))
-        for (char *p = buf; *p; p++)
-            if (*p == '=')
-				combination_counter++;
+		while (fgets(buf, sizeof(buf), combinations))
+			for (char *p = buf; *p; p++)
+				if (*p == '=')
+					combination_counter++;
 
-	rewind(combinations);
+		rewind(combinations);
 
-	combination_t combo[combination_counter];
-	combiArray = combo;
-	combination_counter = 0;
+		combination_t combo[combination_counter];
+		combiArray = combo;
+		combination_counter = 0;
 
-	yyrestart(combinations);
-	yyparse();
-	fclose(combinations);
+		yyrestart(combinations);
+		yyparse();
+		fclose(combinations);
 
-	qsort(combo, combination_counter, sizeof(combination_t), cmp);
+		qsort(combo, combination_counter, sizeof(combination_t), cmp);
 
-	if(binary = fopen("binary.dat", "a")){
-		fwrite(combo, sizeof(combination_t), combination_counter, binary);
-	} else {
-        perror("can't open bin data");
-        return 1;
-    }
+		if(binary = fopen("binary.dat", "a")){
+			fwrite(combo, sizeof(combination_t), combination_counter, binary);
+		} else {
+			perror("can't open bin data");
+			return 1;
+		}
+	}
 
 	////////////////////////////////
 	//
@@ -232,6 +236,7 @@ int main(int argc, char* argv[]) {
 	// metadata
 	// 		2b: amount of elements 
 	//		2b: amount of combinations
+	// 		4b: amount of nodes (wordbook)
 	//		4b: start of group names
 	//		4b: start of element names
 	// elements
@@ -245,26 +250,46 @@ int main(int argc, char* argv[]) {
 	FILE* output = fopen("library.alch2", "w");
 
 	if(output){
+		// 2b: amount of elements 
 		uint16_t val16 = elem_counter;
 		fwrite(&val16, sizeof(uint16_t), 1, output);
+
+		// 2b: amount of combinations
 		val16 = combination_counter;
 		fwrite(&val16, sizeof(uint16_t), 1, output);
 
-		// pack tree and check how much space it takes
-		uint32_t val32 = group_name_ptr;
-		fwrite(&val32, sizeof(uint32_t), 1, output);
-		val32 = elem_name_ptr;
+		// 4b: amount of nodes (wordbook)
+		uint32_t val32 = package.info.nodes;
 		fwrite(&val32, sizeof(uint32_t), 1, output);
 
+		size_t wb_len = get_pack_data_length(package) +
+						package.info.text_length;
 
-		sprintf(buf, "%s binary.dat >> library.alch2", cat_tool);
+		// 4b: start of group names
+		val32 =
+			elem_counter * sizeof(element_t) +
+			combination_counter * sizeof(combination_t) +
+			wb_len;
+		fwrite(&val32, sizeof(uint32_t), 1, output);
+
+		// 4b: start of element names
+		val32 += group_name_ptr;
+		fwrite(&val32, sizeof(uint32_t), 1, output);
+
+		// elements & combinations
+		catFile("binary.dat", output);
 		remove("binary.dat");
 
-		// write wordbook
+		// wordbook
+		fwrite(package.values, wb_len, 1, output);
+		free(package.values);
 
-		sprintf(buf, "%s groups.txt >> library.alch2", cat_tool);
+		// names of groups
+		catFile("groups.txt", output);
 		remove("groups.txt");
-		sprintf(buf, "%s elements.txt >> library.alch2", cat_tool);
+
+		// names of elements
+		catFile("elements.txt", output);
 		remove("elements.txt");
 
 	} else {
@@ -323,6 +348,21 @@ char* get_group_path(char* path){
     sprintf(ptr, "%s%s", path, "/groups");
     puts(ptr);
     return ptr;
+}
+
+void catFile(char* source, FILE* destination) {
+    char buffer[1024];
+    size_t bytesRead;
+
+	FILE* input = fopen(source, "r");
+
+	if(!input){
+		fprintf(stderr, "Can't open %s\n", source);
+		exit(1);
+	}
+
+    while (bytesRead = fread(buffer, 1, sizeof(buffer), input))
+        fwrite(buffer, 1, bytesRead, destination);
 }
 
 %}

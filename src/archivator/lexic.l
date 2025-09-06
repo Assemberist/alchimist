@@ -5,6 +5,7 @@
 
 extern phase Phase;
 extern token* wordbook;
+extern pack package;
 
 static size_t ids = 0;
 
@@ -31,7 +32,7 @@ static size_t ids = 0;
 
 					lbl_word:
 						if(Phase == PHASE3) {
-							yylval.id = (size_t)get_value(yytext, wordbook);
+							yylval.id = (size_t)find_pack_element(yytext, package);
 							return ID;
 						}
 						else {
@@ -40,6 +41,10 @@ static size_t ids = 0;
 						}
 					}
 
-[[:alnum:] ]+\0		{ set_value(yytext, (void*)ids++, wordbook); return WORD_P2; }
+[[:alnum:] ]+\0		{
+						if(ids) set_value(yytext, (void*)ids++, wordbook); 
+						else set_value(yytext, (void*)UINT64MAX, wordbook); // WA for NULL value
+						return WORD_P2;
+					}
 
 %%
