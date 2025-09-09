@@ -22,5 +22,8 @@ string_tree/wb.o: $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
 test_archive.alch2: ../archivator/library.alch2
 	cp $< $@
 
-../archivator/library.alch2:
+../archivator/library.alch2: ../archivator/parser
 	cd ../archivator && ./parser for_test
+
+../archivator/parser:
+	cd ../archivator && make
