@@ -6,7 +6,7 @@
 bool new_game(const char* path);
 bool save(const char* path);
 bool load(const char* path);
-bool exit();
+bool game_exit();
 
 char* status();
 char* list_groups();

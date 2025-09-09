@@ -2,6 +2,7 @@
 
 #include <dirent.h>
 #include "parser.h"
+#include "core/alch_types.h"
 
 extern void yyrestart(FILE*);
 extern int yylex();
@@ -14,18 +15,6 @@ int yywrap(){ return 1; }
 
 
 phase Phase;
-
-typedef struct {
-	uint32_t openFlag: 1;
-	uint32_t groupNamePos: 11;
-	uint32_t namePos: 20;
-} element_t;
-
-typedef struct {
-	uint16_t id1;
-	uint16_t id2;
-	uint16_t idResult;
-} combination_t;
 
 // Prepare
 

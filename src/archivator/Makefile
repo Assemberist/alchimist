@@ -1,12 +1,14 @@
 parser: $(wildcard *.h) \
 		$(wildcard *.c) \
+		syntax.tab.c \
+		lex.yy.c \
 		wb.o
 	gcc *.c wb.o -o parser -g
 
 wb.o: string_tree/wb.o
 	cp $< $@
 
-string_tree/wb.o: syntax.tab.c lex.yy.c $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
+string_tree/wb.o: $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
 	cd string_tree && make
 
 
