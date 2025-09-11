@@ -5,6 +5,8 @@ parser: $(wildcard *.h) \
 		wb.o
 	gcc *.c wb.o -o parser -g
 
+
+
 wb.o: string_tree/wb.o
 	cp $< $@
 
@@ -12,11 +14,13 @@ string_tree/wb.o: $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
 	cd string_tree && make
 
 
+
 syntax.tab.c: syntax.y
-	bison -d syntax.y
+	bison -d $@
 
 lex.yy.c: lexic.l
-	flex lexic.l
+	flex $@
+
 
 
 clean:
