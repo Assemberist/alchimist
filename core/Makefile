@@ -1,5 +1,5 @@
 alchimist: wb.o $(wildcard *.c) $(wildcard *.h)
-	gcc $+ -o $@
+	gcc $+ -o $@ -g
 
 
 wb.o: string_tree/wb.o

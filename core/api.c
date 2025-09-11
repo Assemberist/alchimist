@@ -8,15 +8,15 @@
 
 ///////////////////////////////////////
 
-static element_t* elements = NULL;
-static uint16_t element_num = 0;
-static combination_t* combinations = NULL;
-static uint16_t combination_num = 0;
+element_t* elements = NULL;
+uint16_t element_num = 0;
+combination_t* combinations = NULL;
+uint16_t combination_num = 0;
 
-static pack p;
+pack p;
 
-static char* group_names;
-static char* element_names;
+char* group_names;
+char* element_names;
 
 #define META_LEN sizeof(uint16_t) * 2 - sizeof(uint32_t) * 3
 
