@@ -25,3 +25,5 @@ if_copy archivator/parser
 
 build_dir core
 if_copy core/alchimist
+
+./parser archivator/for_test

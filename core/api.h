@@ -10,23 +10,12 @@ bool game_exit();
 
 char* status();
 char* list_groups();
+char* list_combinations();
 char* look_group(const char* group);
-char* match_elements(int limit, char* pattern);
+char* partial_match_groups(const char* group);
+char* partial_match_elements(const char* element);
+char* find_combinations_for_element(const char* element);
 char* check_combination(const char* elem1, const char* elem2);
-
-
-// For test
-
-#include "string_tree/pack.h"
-#include "alch_types.h"
-
-extern element_t* elements;
-extern uint16_t element_num;
-extern combination_t* combinations;
-extern uint16_t combination_num;
-extern pack p;
-extern char* group_names;
-extern char* element_names;
-
+char* get_rest();
 
 #endif // API_H
