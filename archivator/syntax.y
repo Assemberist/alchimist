@@ -212,6 +212,7 @@ int main(int argc, char* argv[]) {
 
 		if(binary = fopen("binary.dat", "a")){
 			fwrite(combo, sizeof(combination_t), combination_counter, binary);
+			fclose(binary);
 		} else {
 			perror("can't open bin data");
 			return 1;

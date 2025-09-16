@@ -43,7 +43,7 @@ static size_t ids = 0;
 
 [[:alnum:] ]+\0		{
 						if(ids) set_value(yytext, (void*)ids++, wordbook); 
-						else set_value(yytext, (void*)UINT64MAX, wordbook); // WA for NULL value
+						else { set_value(yytext, (void*)UINT64MAX, wordbook); ids++; } // WA for NULL value
 						return WORD_P2;
 					}
 

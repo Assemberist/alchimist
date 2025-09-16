@@ -79,9 +79,9 @@ bool new_game(const char* path){
 
         for(counter = 0; counter < element_num; counter++)
             printf("%s:%s %d->%s\n",
-                p.texts + elements[counter].groupNamePos,
-                p.texts + elements[counter].namePos,
-                p.texts + elements[counter].namePos,
+                group_names + elements[counter].groupNamePos,
+                element_names + elements[counter].namePos,
+                element_names + elements[counter].namePos,
                 elements[counter].openFlag ? "[OPEN]" : ""
             );
 

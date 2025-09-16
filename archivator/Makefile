@@ -16,10 +16,10 @@ string_tree/wb.o: $(wildcard string_tree/*.c) $(wildcard string_tree/*.h)
 
 
 syntax.tab.c: syntax.y
-	bison -d $@
+	bison -d $<
 
 lex.yy.c: lexic.l
-	flex $@
+	flex $<
 
 
 
