@@ -6,8 +6,12 @@
 #include <stdlib.h>
 #include "string_tree/pack.h"
 
+#include "bycicles.h"
+
 #define META_LEN (sizeof(uint16_t) * 2 + sizeof(uint32_t) * 3)
 
+///////////////////////////////////////
+// static vars //
 ///////////////////////////////////////
 
 element_t* elements = NULL;
@@ -21,9 +25,12 @@ char* group_names;
 char* element_names;
 
 ///////////////////////////////////////
+// static vars //
+///////////////////////////////////////
 
 enum request_type {
     LIST_GROUPS,
+    LIST_ELEMENTS,
     LIST_COMBINATIONS,
     LOOK_GROUP,
     PARTIAL_MATCH_GROUPS,
@@ -34,8 +41,37 @@ enum request_type {
 } latest_request = NOTHING;
 
 size_t counter = 0;
-
 static char* current_group = NULL;
+static size_t current_element = 0;
+
+///////////////////////////////////////
+// help functions //
+///////////////////////////////////////
+
+bool isComboOpen(size_t id){
+    return elements[combinations[counter].id1].openFlag &&
+           elements[combinations[counter].id2].openFlag &&
+           elements[combinations[counter].idResult].openFlag;
+}
+
+#define returnCombination(A) \
+            return (combination){ \
+                    element_names + elements[combinations[A].id1].namePos, \
+                    element_names + elements[combinations[A].id2].namePos, \
+                    element_names + elements[combinations[A].idResult].namePos }
+
+///////////////////////////////////////
+// test section //
+///////////////////////////////////////
+
+void openAll(){
+    for(size_t i = 0; i < element_num; i++)
+        elements[i].openFlag = true;
+}
+
+///////////////////////////////////////
+// API calls //
+///////////////////////////////////////
 
 bool new_game(const char* path){
     // Cleanup previous game
@@ -77,70 +113,147 @@ bool new_game(const char* path){
         group_names = (char*)elements + group_offset;
         element_names = (char*)elements + element_offset;
 
-        for(counter = 0; counter < element_num; counter++)
-            printf("%s:%s %d->%s\n",
-                group_names + elements[counter].groupNamePos,
-                element_names + elements[counter].namePos,
-                element_names + elements[counter].namePos,
-                elements[counter].openFlag ? "[OPEN]" : ""
-            );
-
         return true;
     }
     else return false;
 }
 
 char* list_groups(){
-    printf("%d -> air\n\n", elements);
-
     latest_request = LIST_GROUPS;
     current_group = NULL;
-    for(counter = 0; counter < element_num; counter++){
-        printf("%s:%s %d->%s\n",
-               p.texts + elements[counter].groupNamePos,
-               p.texts + elements[counter].namePos,
-               p.texts + elements[counter].namePos,
-               elements[counter].openFlag ? "[OPEN]" : ""
-            );
+    for(counter = 0; counter < element_num; counter++)
+        if(elements[counter].openFlag)
+            return current_group = group_names + elements[counter].groupNamePos;
 
-        if(elements[counter].openFlag){
-            current_group = p.texts + elements[counter].groupNamePos;
-            break;
-        }
-    }
-    return current_group;
+    latest_request = NOTHING;
+    return NULL;
 }
 
+char* list_elements(){
+    latest_request = LIST_ELEMENTS;
+    for(counter = 0; counter < element_num; counter++)
+        if(elements[counter].openFlag)
+            return element_names + elements[counter].namePos;
+
+    latest_request = NOTHING;
+    return NULL;
+}
+
+char* look_group(const char* group){
+    latest_request = LOOK_GROUP;
+    size_t gp;
+
+    for(counter = 0; counter < element_num; counter++)
+        if(!strcmp(group, group_names + elements[counter].groupNamePos)){
+            gp = elements[counter].groupNamePos;
+            goto group_check;
+        }
+
+    for(; counter < element_num; counter++)
+        if(elements[counter].groupNamePos == gp)
+            group_check:
+                if(elements[counter].openFlag)
+                    return element_names + elements[counter].namePos;
+
+    latest_request = NOTHING;
+    return NULL;
+}
 
 /*bool save(const char* path);
 bool load(const char* path);
 bool game_exit();
 
+char* partial_match_groups(const char* group);
+char* partial_match_elements(const char* element);
+char* get_rest();
+
 char* status();
-char* look_group(const char* group);
-char* match_elements(int limit, char* pattern);
 char* check_combination(const char* elem1, const char* elem2);
 */
 
 char* get_rest(){
+    counter++;
     switch(latest_request){
         case LIST_GROUPS:
             for(; counter < element_num; counter++){
                 if(elements[counter].openFlag){
-                    char* gp = p.texts + elements[counter].groupNamePos;
+                    char* gp = group_names + elements[counter].groupNamePos;
                     if(gp != current_group){
                         current_group = gp;
                         return gp;
                     }
                 }
             }
-        
-            current_group = NULL;
-            latest_request = NOTHING;
-            return current_group;
+            break;
 
+        case LIST_ELEMENTS:
+            for(; counter < element_num; counter++)
+                if(elements[counter].openFlag)
+                    return element_names + elements[counter].namePos;
+
+            break;
+
+        case LOOK_GROUP:
+            for(; counter < element_num; counter++){
+                if(elements[counter].groupNamePos != elements[counter-1].groupNamePos)
+                    break;
+
+                if(elements[counter].openFlag)
+                    return element_names + elements[counter].namePos;
+            }
 
         default:
-            return NULL;
+            break;
     }
+    
+    latest_request = NOTHING;
+    return NULL;
+}
+
+combination list_combinations(){
+    latest_request = LIST_COMBINATIONS;
+    counter = -1;
+    return next_combination();
+}
+
+combination find_combinations_for_element(const char* element){
+    latest_request = FIND_ELEMENT_COMBO;
+    current_element = (size_t)find_pack_element(element, p);
+
+    if(!elements[current_element].openFlag)
+        return (combination){NULL, NULL, NULL};
+
+    for(counter = 0; counter < combination_num; counter++){
+        if(combinations[counter].id1 == current_element ||
+           combinations[counter].id2 == current_element){
+                if(isComboOpen(counter))
+                    returnCombination(counter);
+        }
+    }
+    return (combination){NULL, NULL, NULL};
+}
+
+combination next_combination(){
+    counter++;
+    switch(latest_request){
+        case LIST_COMBINATIONS:
+            for(; counter < combination_num; counter++)
+                if(isComboOpen(counter))
+                    returnCombination(counter);
+
+            break;
+
+        case FIND_ELEMENT_COMBO:
+            for(; counter < combination_num; counter++)
+                if( combinations[counter].id1 == current_element ||
+                    combinations[counter].id2 == current_element)
+                        if(isComboOpen(counter))
+                            returnCombination(counter);
+
+        default:
+            break;
+    }
+
+    latest_request = NOTHING;
+    return (combination){NULL, NULL, NULL};
 }
