@@ -3,3 +3,6 @@
 	branch = master
 	path = submod/string_tree
 	url = https://github.com/assemberist/string_tree
+[submodule "submod/md5-c"]
+	path = submod/md5-c
+	url = https://github.com/Zunawe/md5-c
