@@ -12,7 +12,7 @@ build_dir(){
     cd -
 }
 
-if [ -f submod/string_tree/Makefile ];
+if [ ! -f submod/string_tree/Makefile ];
 then
     git submodule init
     git submodule update
