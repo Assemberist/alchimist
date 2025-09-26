@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include "string_tree/pack.h"
 
-#include "bycicles.h"
-
 #define META_LEN (sizeof(uint16_t) * 2 + sizeof(uint32_t) * 3)
 
 ///////////////////////////////////////
@@ -44,6 +42,13 @@ size_t counter = 0;
 static char* current_group = NULL;
 static size_t current_element = 0;
 
+char partial_name[40];
+
+struct{
+    uint32_t* nodes;
+    size_t depth;
+} node_stack;
+
 ///////////////////////////////////////
 // help functions //
 ///////////////////////////////////////
@@ -59,6 +64,15 @@ bool isComboOpen(size_t id){
                     element_names + elements[combinations[A].id1].namePos, \
                     element_names + elements[combinations[A].id2].namePos, \
                     element_names + elements[combinations[A].idResult].namePos }
+
+int cmpCombo(const void* c1, const void* c2){ return *(uint32_t*)c1 == *(uint32_t*)c2; }
+
+void create_node_stack(pack package){
+    // find max depth
+    // size_t max_depth =
+
+    // node_stack.nodes = malloc(max_depth * sizeof(uint32_t));
+}
 
 ///////////////////////////////////////
 // test section //
@@ -113,6 +127,8 @@ bool new_game(const char* path){
         group_names = (char*)elements + group_offset;
         element_names = (char*)elements + element_offset;
 
+        create_node_stack(p);
+
         return true;
     }
     else return false;
@@ -121,22 +137,14 @@ bool new_game(const char* path){
 char* list_groups(){
     latest_request = LIST_GROUPS;
     current_group = NULL;
-    for(counter = 0; counter < element_num; counter++)
-        if(elements[counter].openFlag)
-            return current_group = group_names + elements[counter].groupNamePos;
-
-    latest_request = NOTHING;
-    return NULL;
+    counter = -1;
+    return get_rest();
 }
 
 char* list_elements(){
     latest_request = LIST_ELEMENTS;
-    for(counter = 0; counter < element_num; counter++)
-        if(elements[counter].openFlag)
-            return element_names + elements[counter].namePos;
-
-    latest_request = NOTHING;
-    return NULL;
+    counter = -1;
+    return get_rest();
 }
 
 char* look_group(const char* group){
@@ -159,16 +167,26 @@ char* look_group(const char* group){
     return NULL;
 }
 
+char* partial_match_groups(const char* group){
+    latest_request = PARTIAL_MATCH_GROUPS;
+    current_group = 0;
+    counter = -1;
+    strcpy(partial_name, group);
+    return get_rest();
+}
+
+char* partial_match_elements(const char* element){
+    latest_request = PARTIAL_MATCH_ELEMENTS;
+
+
+    return get_rest();
+}
+
 /*bool save(const char* path);
 bool load(const char* path);
 bool game_exit();
 
-char* partial_match_groups(const char* group);
-char* partial_match_elements(const char* element);
-char* get_rest();
-
 char* status();
-char* check_combination(const char* elem1, const char* elem2);
 */
 
 char* get_rest(){
@@ -200,6 +218,19 @@ char* get_rest(){
 
                 if(elements[counter].openFlag)
                     return element_names + elements[counter].namePos;
+            }
+            break;
+
+        case PARTIAL_MATCH_GROUPS:
+            for(; counter < element_num; counter++){
+                if(elements[counter].openFlag){
+                    char* gp = group_names + elements[counter].groupNamePos;
+                    if(gp != current_group){
+                        current_group = gp;
+                        if(strstr(current_group, partial_name))
+                            return current_group;
+                    }
+                }
             }
 
         default:
@@ -256,4 +287,27 @@ combination next_combination(){
 
     latest_request = NOTHING;
     return (combination){NULL, NULL, NULL};
+}
+
+char* check_combination(const char* elem1, const char* elem2){
+    size_t id1 = (size_t)find_pack_element(elem1, p);
+    if(!elements[id1].openFlag) return NULL;
+
+    size_t id2 = (size_t)find_pack_element(elem2, p);
+    if(!elements[id2].openFlag) return NULL;
+
+    uint32_t combo = id1 > id2 ? (id2 << 16) | id1 : (id1 << 16) | id2;
+
+    void* value = bsearch(&combo,
+                         combinations,
+                        combination_num,
+                         sizeof(combination_t),
+                       cmpCombo);
+    
+    if(!value) return NULL;
+
+    element_t* elem = elements + ((combination_t*)value)->idResult;
+    elem->openFlag = true;
+
+    return element_names + elem->namePos;
 }

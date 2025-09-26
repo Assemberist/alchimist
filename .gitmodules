@@ -1,6 +1,6 @@
 [submodule "src/submod/string_tree"]
 	update = merge
-	branch = master
+	branch = fork_for_alchimist
 	path = submod/string_tree
 	url = https://github.com/assemberist/string_tree
 [submodule "submod/md5-c"]

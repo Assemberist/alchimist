@@ -2,7 +2,7 @@
 
 #include <dirent.h>
 #include "parser.h"
-#include "core/alch_types.h"
+#include "alch_types.h"
 
 extern void yyrestart(FILE*);
 extern int yylex();
