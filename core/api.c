@@ -249,7 +249,10 @@ combination list_combinations(){
 
 combination find_combinations_for_element(const char* element){
     latest_request = FIND_ELEMENT_COMBO;
-    current_element = (size_t)find_pack_element(element, p);
+    current_element = (size_t)find_pack_element(element, p, (void*)UINT64_MAX);
+    
+    if(current_element == UINT64_MAX)
+        return (combination){NULL, NULL, NULL};
 
     if(!elements[current_element].openFlag)
         return (combination){NULL, NULL, NULL};
@@ -261,6 +264,8 @@ combination find_combinations_for_element(const char* element){
                     returnCombination(counter);
         }
     }
+
+    latest_request = NOTHING;
     return (combination){NULL, NULL, NULL};
 }
 
@@ -290,10 +295,12 @@ combination next_combination(){
 }
 
 char* check_combination(const char* elem1, const char* elem2){
-    size_t id1 = (size_t)find_pack_element(elem1, p);
+    size_t id1 = (size_t)find_pack_element(elem1, p, (void*)UINT64_MAX);
+    if(id1 == UINT64_MAX) return NULL;
     if(!elements[id1].openFlag) return NULL;
 
-    size_t id2 = (size_t)find_pack_element(elem2, p);
+    size_t id2 = (size_t)find_pack_element(elem2, p, (void*)UINT64_MAX);
+    if(id2 == UINT64_MAX) return NULL;
     if(!elements[id2].openFlag) return NULL;
 
     uint32_t combo = id1 > id2 ? (id2 << 16) | id1 : (id1 << 16) | id2;

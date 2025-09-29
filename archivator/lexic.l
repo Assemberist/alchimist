@@ -32,7 +32,7 @@ static size_t ids = 0;
 
 					lbl_word:
 						if(Phase == PHASE3) {
-							yylval.id = (size_t)find_pack_element(yytext, package);
+							yylval.id = (size_t)find_pack_element_default(yytext, package);
 							return ID;
 						}
 						else {
@@ -43,7 +43,7 @@ static size_t ids = 0;
 
 [[:alnum:] ]+\0		{
 						if(ids) set_value(yytext, (void*)ids++, wordbook); 
-						else { set_value(yytext, (void*)UINT64MAX, wordbook); ids++; } // WA for NULL value
+						else { set_value(yytext, (void*)UINT64_MAX, wordbook); ids++; } // WA for NULL value
 						return WORD_P2;
 					}
 

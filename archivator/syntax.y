@@ -166,9 +166,12 @@ int main(int argc, char* argv[]) {
 		remove_tree(wordbook);
 
 		// WA for NULL values
-		for(int i = 0; i < package.info.nodes; i++)
+		for(int i = 0; i < package.info.nodes; i++){
 			if(package.values[i] == (void*)UINT64MAX)
 				package.values[i] = 0;
+			esle if(package.values[i] == 0)
+				package.values[i] = (void*)UINT64MAX;
+		}
 	}
 
 	////////////////////////////////

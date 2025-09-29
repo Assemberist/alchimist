@@ -7,9 +7,9 @@ int main(int argc, char** argv){
     if(new_game(argv[1])){
         openAll();
 
-        char* ptr = look_group("first");
+        char* ptr = check_combination("fire", "water");
 
         puts(ptr ? ptr : "NULL");
-        while(ptr = get_rest()) puts(ptr);
+        //while(ptr = get_rest()) puts(ptr);
     }
 }
