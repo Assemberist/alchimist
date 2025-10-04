@@ -24,7 +24,6 @@ lex.yy.c: lexic.l
 
 
 clean:
-	cd string_tree && make clean
 	rm 	parser \
 		syntax.tab.c \
 		syntax.tab.h \
