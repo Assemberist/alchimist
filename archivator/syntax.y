@@ -162,16 +162,11 @@ int main(int argc, char* argv[]) {
 			perror("can't open elemnts (phase 2)");
 			return 1;
 		}
-		package = pack_tree_default(wordbook);
+		package = pack_tree(wordbook);
 		remove_tree(wordbook);
 
 		// WA for NULL values
-		for(int i = 0; i < package.info.nodes; i++){
-			if(package.values[i] == (void*)UINT64_MAX)
-				package.values[i] = 0;
-			else if(package.values[i] == 0)
-				package.values[i] = (void*)UINT64_MAX;
-		}
+		reset_stop_value(package, (void*)UINT64_MAX);
 	}
 
 	////////////////////////////////
@@ -232,6 +227,7 @@ int main(int argc, char* argv[]) {
 	// 		4b: amount of nodes (wordbook)
 	//		4b: start of group names
 	//		4b: start of element names
+	//		4b: max id-stack depth
 	// elements
 	// combinations
 	// wordbook
@@ -267,6 +263,10 @@ int main(int argc, char* argv[]) {
 
 		// 4b: start of element names
 		val32 += group_name_ptr;
+		fwrite(&val32, sizeof(uint32_t), 1, output);
+
+		// 4b: max id-stack depth
+		val32 = get_pack_depth(package);
 		fwrite(&val32, sizeof(uint32_t), 1, output);
 
 		// elements & combinations

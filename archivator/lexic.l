@@ -32,7 +32,7 @@ static size_t ids = 0;
 
 					lbl_word:
 						if(Phase == PHASE3) {
-							yylval.id = (size_t)find_pack_element_default(yytext, package);
+							yylval.id = (size_t)find_pack_element(yytext, package);
 							return ID;
 						}
 						else {

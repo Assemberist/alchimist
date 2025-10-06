@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "string_tree/pack.h"
 
-#define META_LEN (sizeof(uint16_t) * 2 + sizeof(uint32_t) * 3)
+#define META_LEN (sizeof(uint16_t) * 2 + sizeof(uint32_t) * 4)
 
 ///////////////////////////////////////
 // static vars //
@@ -93,6 +93,8 @@ bool new_game(const char* path){
         free(elements);
         elements = NULL;
     }
+
+    set_stop_value((void*)UINT64_MAX);
 
     FILE* in = fopen(path, "rb");
     if(in){
@@ -249,7 +251,7 @@ combination list_combinations(){
 
 combination find_combinations_for_element(const char* element){
     latest_request = FIND_ELEMENT_COMBO;
-    current_element = (size_t)find_pack_element(element, p, (void*)UINT64_MAX);
+    current_element = (size_t)find_pack_element(element, p);
     
     if(current_element == UINT64_MAX)
         return (combination){NULL, NULL, NULL};
@@ -295,11 +297,11 @@ combination next_combination(){
 }
 
 char* check_combination(const char* elem1, const char* elem2){
-    size_t id1 = (size_t)find_pack_element(elem1, p, (void*)UINT64_MAX);
+    size_t id1 = (size_t)find_pack_element(elem1, p);
     if(id1 == UINT64_MAX) return NULL;
     if(!elements[id1].openFlag) return NULL;
 
-    size_t id2 = (size_t)find_pack_element(elem2, p, (void*)UINT64_MAX);
+    size_t id2 = (size_t)find_pack_element(elem2, p);
     if(id2 == UINT64_MAX) return NULL;
     if(!elements[id2].openFlag) return NULL;
 
