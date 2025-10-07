@@ -1,0 +1,36 @@
+dust
+warmth
+myst
+lava
+dirt
+cold
+swamp
+steam
+stone
+ice
+snow
+river
+life
+metal
+meteorit
+aquamarine
+vulkan
+{st Petersburg}
+hail
+iceberg
+blizzard
+winter
+summer
+cloud
+{spring source}
+fish
+grass
+bacteria
+frog
+bird
+krator
+tsunami
+rain
+rainbow
+wind
+lizard

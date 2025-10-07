@@ -1,4 +1,4 @@
-[Open] air
-[Open] fire
-[Open] water
-[Open] ground
+[open] fire
+[open] air
+[open] ground
+[open] water
