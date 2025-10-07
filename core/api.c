@@ -34,7 +34,7 @@ enum request_type {
     PARTIAL_MATCH_GROUPS,
     PARTIAL_MATCH_ELEMENTS,
     FIND_ELEMENT_COMBO,
-    CHECK_COMBINATION,
+    //CHECK_COMBINATION,
     NOTHING
 } latest_request = NOTHING;
 
