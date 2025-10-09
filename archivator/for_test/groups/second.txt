@@ -20,7 +20,6 @@ hail
 iceberg
 blizzard
 winter
-summer
 cloud
 {spring source}
 fish

@@ -65,7 +65,11 @@ bool isComboOpen(size_t id){
                     element_names + elements[combinations[A].id2].namePos, \
                     element_names + elements[combinations[A].idResult].namePos }
 
-int cmpCombo(const void* c1, const void* c2){ return *(uint32_t*)c1 == *(uint32_t*)c2; }
+int cmpCombo(const void* c1, const void* c2){
+    if(*(uint32_t*)c1 < *(uint32_t*)c2) return -1;
+    if(*(uint32_t*)c1 > *(uint32_t*)c2) return 1;
+    return 0;
+}
 
 void create_node_stack(pack package){
     // find max depth
@@ -123,7 +127,7 @@ bool new_game(const char* path){
         p.values = (void**)(combinations + combination_num);
         p.text_shifts = (uint32_t*)(p.values + p.info.nodes);
         p.flags = (uint8_t*)(p.text_shifts + p.info.nodes);
-        p.texts = (char*)(p.flags + p.info.nodes / 4);
+        p.texts = (char*)(p.flags + p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0));
 
         // texts
         group_names = (char*)elements + group_offset;
@@ -305,7 +309,7 @@ char* check_combination(const char* elem1, const char* elem2){
     if(id2 == UINT64_MAX) return NULL;
     if(!elements[id2].openFlag) return NULL;
 
-    uint32_t combo = id1 > id2 ? (id2 << 16) | id1 : (id1 << 16) | id2;
+    uint32_t combo = id1 < id2 ? (id2 << 16) | id1 : (id1 << 16) | id2;
 
     void* value = bsearch(&combo,
                          combinations,

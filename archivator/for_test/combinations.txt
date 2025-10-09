@@ -20,7 +20,6 @@ air+ice=hail
 water+ice=iceberg
 air+snow=blizzard
 air+cold=winter
-air+warmth=summer
 air+steam=cloud
 ground+river={spring source}
 river+life=fish

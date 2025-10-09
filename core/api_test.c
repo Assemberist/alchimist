@@ -42,9 +42,8 @@ int main(int argc, char** argv){
 
             puts("\nCheck combinations");
             for(combination combo = list_combinations(); combo.reagent1; combo = next_combination()){
-                printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, combo.result);
-                printf("Direct: %s + %s = %s\n", combo.reagent1, combo.reagent2, combo.result);
-                printf("Reverce: %s + %s = %s\n\n", combo.reagent2, combo.reagent1, combo.result);
+                char* ptr = check_combination(combo.reagent1, combo.reagent2);
+                printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
             }
         }
 
@@ -82,9 +81,8 @@ int main(int argc, char** argv){
 
             puts("\nCheck combinations");
             for(combination combo = list_combinations(); combo.reagent1; combo = next_combination()){
-                printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, combo.result);
-                printf("Direct: %s + %s = %s\n", combo.reagent1, combo.reagent2, combo.result);
-                printf("Reverce: %s + %s = %s\n\n", combo.reagent2, combo.reagent1, combo.result);
+                char* ptr = check_combination(combo.reagent1, combo.reagent2);
+                printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
             }
         }
     }
