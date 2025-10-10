@@ -12,6 +12,7 @@ int main(int argc, char** argv){
     if(argc == 1) return -1;
 
     if(new_game(argv[1])){
+        /*
         {
             puts("Element list:");
             for(char* ptr = list_elements(); ptr; ptr = get_rest())
@@ -46,11 +47,11 @@ int main(int argc, char** argv){
                 printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
             }
         }
-
+*/
         puts("\nOpen all\n");
         openAll();
 
-        {
+/*        {
             puts("\nElement list:");
             for(char* ptr = list_elements(); ptr; ptr = get_rest())
                 puts(ptr);
@@ -85,5 +86,10 @@ int main(int argc, char** argv){
                 printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
             }
         }
+            */
+
+        for(char* ptr = partial_match_elements("g"); ptr; ptr = get_rest())
+            puts(ptr);
+
     }
 }

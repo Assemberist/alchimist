@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string_tree/pack.h"
+#include "string_tree/hide_lib.h"
 
 #define META_LEN (sizeof(uint16_t) * 2 + sizeof(uint32_t) * 4)
 
@@ -71,11 +72,91 @@ int cmpCombo(const void* c1, const void* c2){
     return 0;
 }
 
-void create_node_stack(pack package){
-    // find max depth
-    // size_t max_depth =
+///////////////////////////////////////
+// Help function uses hide_lib.h  //
+///////////////////////////////////////
 
-    // node_stack.nodes = malloc(max_depth * sizeof(uint32_t));
+void* find_root_rec(size_t pos, char* name){
+    size_t diff;
+    char* ptr;
+
+    goto lbl_match_3;
+
+    do {
+        pos++;
+
+        lbl_match_3:
+            ptr = p.texts + p.text_shifts[pos];
+
+            if(*ptr != *name) 
+                continue;
+
+            diff = strdif(name, ptr);
+            
+            if(!name[diff]) // key matched
+                return p.values + pos;
+
+            // token matched
+            if(!ptr[diff]){
+                if(!haveValue(p.flags, pos)){
+                    pos = (size_t)p.values[pos];
+                    name += diff;
+                    goto lbl_match_3;
+                }
+            }
+            
+            // key and token not match each other
+            break;
+
+    } while(haveNext(p.flags, pos));
+
+    return NULL;
+}
+
+char* find_root(char* name){
+    void** ptr = NULL;
+
+    if(p.texts[p.text_shifts[name[0]]])
+        ptr = find_root_rec(name[0], name);
+
+    if(!ptr) return NULL;
+
+    node_stack.depth = 1;
+    node_stack.nodes[0] = ptr - p.values;
+    size_t pos = node_stack.nodes[node_stack.depth-1];
+
+    while(!haveValue(p.flags, pos) && p.values[pos] != (void*)UINT64_MAX){
+        node_stack.nodes[node_stack.depth] = (size_t)p.values[pos];
+        pos = node_stack.nodes[node_stack.depth];
+        node_stack.depth++;
+    }
+
+    if(p.values[pos] == (void*)UINT64_MAX)
+        return NULL;
+
+    return element_names + elements[(size_t)p.values[pos]].namePos;
+}
+
+char* match_next(){
+    while(node_stack.depth){
+        size_t pos = node_stack.nodes[node_stack.depth-1];
+        if(haveNext(p.flags, pos)){
+            node_stack.nodes[node_stack.depth-1]++;
+            pos++;
+            while(!haveValue(p.flags, pos) && p.values[pos] != (void*)UINT64_MAX){
+                node_stack.nodes[node_stack.depth] = (size_t)p.values[pos];
+                pos = node_stack.nodes[node_stack.depth];
+                node_stack.depth++;
+            }
+
+            if(p.values[pos] == (void*)UINT64_MAX)
+                return NULL;
+
+            return element_names + elements[(size_t)p.values[pos]].namePos;
+        }
+        else node_stack.depth--;
+    }
+    return NULL;
 }
 
 ///////////////////////////////////////
@@ -104,12 +185,14 @@ bool new_game(const char* path){
     if(in){
         uint32_t group_offset;
         uint32_t element_offset;
+        uint32_t max_depth;
 
         fread(&element_num, sizeof(uint16_t), 1, in);
         fread(&combination_num, sizeof(uint16_t), 1, in);
         fread(&p.info.nodes, sizeof(uint32_t), 1, in);
         fread(&group_offset, sizeof(uint32_t), 1, in);
         fread(&element_offset, sizeof(uint32_t), 1, in);
+        fread(&max_depth, sizeof(uint32_t), 1, in);
 
         fseek(in, 0, SEEK_END);
         size_t size = ftell(in) - META_LEN;
@@ -133,7 +216,10 @@ bool new_game(const char* path){
         group_names = (char*)elements + group_offset;
         element_names = (char*)elements + element_offset;
 
-        create_node_stack(p);
+        // re/init name stack
+        if(node_stack.nodes) free(node_stack.nodes);
+        node_stack.nodes = malloc(max_depth * sizeof(uint32_t));
+        node_stack.depth = 0;
 
         return true;
     }
@@ -182,18 +268,10 @@ char* partial_match_groups(const char* group){
 }
 
 char* partial_match_elements(const char* element){
-    latest_request = PARTIAL_MATCH_ELEMENTS;
-
-
-    return get_rest();
+    char* res = find_root(element);
+    latest_request = res ? PARTIAL_MATCH_ELEMENTS : NOTHING;
+    return res;
 }
-
-/*bool save(const char* path);
-bool load(const char* path);
-bool game_exit();
-
-char* status();
-*/
 
 char* get_rest(){
     counter++;
@@ -227,6 +305,13 @@ char* get_rest(){
             }
             break;
 
+        case PARTIAL_MATCH_ELEMENTS:
+        {
+            char* next = match_next();
+            if(next) return next;
+            break;
+        }
+            
         case PARTIAL_MATCH_GROUPS:
             for(; counter < element_num; counter++){
                 if(elements[counter].openFlag){
@@ -324,3 +409,10 @@ char* check_combination(const char* elem1, const char* elem2){
 
     return element_names + elem->namePos;
 }
+
+/*bool save(const char* path);
+bool load(const char* path);
+bool game_exit();
+
+char* status();
+*/
