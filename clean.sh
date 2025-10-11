@@ -15,3 +15,6 @@ cd -
 rm	alchimist \
     library.alch2 \
     parser
+
+rm -r saves
+

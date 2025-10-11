@@ -462,8 +462,13 @@ bool save(const char* path, bool force){
         }
     }
 
+    uint8_t data[element_num/8 + (element_num & 7 ? 1 : 0)];
+    memset(data, 0, sizeof(data));
+    for(size_t i = 0; i < element_num; i++)
+        data[i/8] |= (uint8_t)elements[i].openFlag << (i&7);
+
     FILE* savefile = fopen(file_path, "w");
-    fwrite(p.flags, 1, p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0), savefile);
+    fwrite(data, 1, sizeof(data), savefile);
     fclose(savefile);
 
     return true;
@@ -477,12 +482,18 @@ bool load(const char* path){
     FILE* savefile = fopen(file_path, "r");
     if(!savefile) return false;
 
+    uint8_t data[element_num/8 + (element_num & 7 ? 1 : 0)];
+
     fseek(savefile, 0, SEEK_END);
-    if(p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0) != ftell(savefile)) return false;
+    if(ftell(savefile) != sizeof(data)) return false;
 
     fseek(savefile, 0, SEEK_SET);
-    fread(p.flags, 1, p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0), savefile);
-    
+    fread(data, 1, sizeof(data), savefile);
+    fclose(savefile);
+
+    for(size_t i = 0; i < element_num; i++)
+        elements[i].openFlag = (data[i/8] >> (i&7) & 1);
+
     return true;
 }
 

@@ -48,10 +48,12 @@ int main(int argc, char** argv){
             }
         }
 */
+        save("test", true);
+
         puts("\nOpen all\n");
         openAll();
 
-/*        {
+        {
             puts("\nElement list:");
             for(char* ptr = list_elements(); ptr; ptr = get_rest())
                 puts(ptr);
@@ -85,13 +87,50 @@ int main(int argc, char** argv){
                 char* ptr = check_combination(combo.reagent1, combo.reagent2);
                 printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
             }
+
+            //for(char* ptr = partial_match_elements("g"); ptr; ptr = get_rest())
+            //    puts(ptr);
         }
             
+        load("test");
 
-        for(char* ptr = partial_match_elements("g"); ptr; ptr = get_rest())
-            puts(ptr);
-        */
+        {
+            puts("\nElement list:");
+            for(char* ptr = list_elements(); ptr; ptr = get_rest())
+                puts(ptr);
 
-        save("test", false);
+            puts("\nGroup list:");
+            size_t i = 0;
+            for(char* ptr = list_groups(); ptr; ptr = get_rest()){
+                puts(ptr);
+                i++;
+            }
+
+            char* groups[i];
+            i = 0;
+            for(char* ptr = list_groups(); ptr; ptr = get_rest())
+                groups[i++] = ptr;
+
+            puts("\nLook groups:");
+            for(int j = 0; j < i; j++){
+                puts(groups[j]);
+                for(char* ptr = look_group(groups[j]); ptr; ptr = get_rest())
+                    puts(ptr);
+                puts("");
+            }
+
+            puts("\nList combinations");
+            for(combination combo = list_combinations(); combo.reagent1; combo = next_combination())
+                printf("%s + %s = %s\n", combo.reagent1, combo.reagent2, combo.result);
+
+            puts("\nCheck combinations");
+            for(combination combo = list_combinations(); combo.reagent1; combo = next_combination()){
+                char* ptr = check_combination(combo.reagent1, combo.reagent2);
+                printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
+            }
+
+            //for(char* ptr = partial_match_elements("g"); ptr; ptr = get_rest())
+            //    puts(ptr);
+        }
     }
 }
