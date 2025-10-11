@@ -1,16 +1,22 @@
-#include "api.h"
-#include "alch_types.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "api.h"
+#include "alch_types.h"
+#include "platform.h"
+
 #include "string_tree/pack.h"
 #include "string_tree/hide_lib.h"
+#include "md5.h"
 
+// see Phase 4: concat data to archive" (archivator/syntax.y)
 #define META_LEN (sizeof(uint16_t) * 2 + sizeof(uint32_t) * 4)
 
 ///////////////////////////////////////
-// static vars //
+// static archive vars //
 ///////////////////////////////////////
 
 element_t* elements = NULL;
@@ -23,8 +29,10 @@ pack p;
 char* group_names;
 char* element_names;
 
+char hash[33];
+
 ///////////////////////////////////////
-// static vars //
+// request vars //
 ///////////////////////////////////////
 
 enum request_type {
@@ -70,6 +78,15 @@ int cmpCombo(const void* c1, const void* c2){
     if(*(uint32_t*)c1 < *(uint32_t*)c2) return -1;
     if(*(uint32_t*)c1 > *(uint32_t*)c2) return 1;
     return 0;
+}
+
+void bytes_to_hex(uint8_t bytes[16], char hex[33]) {
+    const char *digits = "0123456789abcdef";
+    for (int i = 0; i < 16; i++) {
+        hex[i * 2]     = digits[bytes[i] >> 4];
+        hex[i * 2 + 1] = digits[bytes[i] & 0xF];
+    }
+    hex[32] = '\0';
 }
 
 ///////////////////////////////////////
@@ -220,6 +237,14 @@ bool new_game(const char* path){
         if(node_stack.nodes) free(node_stack.nodes);
         node_stack.nodes = malloc(max_depth * sizeof(uint32_t));
         node_stack.depth = 0;
+
+        // Calculate hash of archive
+        uint8_t md5_hash[16];
+        fseek(in, 0, SEEK_SET);
+        md5File(in, md5_hash);
+        bytes_to_hex(md5_hash, hash);
+
+        fclose(in);
 
         return true;
     }
@@ -410,9 +435,81 @@ char* check_combination(const char* elem1, const char* elem2){
     return element_names + elem->namePos;
 }
 
-/*bool save(const char* path);
-bool load(const char* path);
-bool game_exit();
+bool save(const char* path, bool force){
+    size_t len = 5 + 1 + 32 + 1 + strlen(path); // saves + / + <<hash>> + / + <<name>>
+    char file_path[len + 4 + 1]; // saves + / + <<hash>> + / + <<name>> + .sav + \0
+    
+    strcpy(file_path, "saves");
 
-char* status();
-*/
+    if(!dir_exists(file_path))
+        create_dir(file_path);
+
+    file_path[5] = '/';
+    strcpy(file_path + 6 , hash);
+
+    if(!dir_exists(file_path))
+        create_dir(file_path);
+
+    file_path[38] = '/';
+    strcpy(file_path + 39 , path);
+    strcpy(file_path + len, ".sav");
+
+    if(!force){
+        FILE* savefile_if_exist = fopen(file_path, "r");
+        if(savefile_if_exist){
+            fclose(savefile_if_exist);
+            return false;
+        }
+    }
+
+    FILE* savefile = fopen(file_path, "w");
+    fwrite(p.flags, 1, p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0), savefile);
+    fclose(savefile);
+
+    return true;
+}
+
+bool load(const char* path){
+    size_t len = 5 + 1 + 32 + 1 + strlen(path); // saves + / + <<hash>> + / + <<name>>
+    char file_path[len + 4 + 1]; // saves + / + <<hash>> + / + <<name>> + .sav + \0
+    sprintf(file_path, "saves/%s/%s.sav", hash, path);
+
+    FILE* savefile = fopen(file_path, "r");
+    if(!savefile) return false;
+
+    fseek(savefile, 0, SEEK_END);
+    if(p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0) != ftell(savefile)) return false;
+
+    fseek(savefile, 0, SEEK_SET);
+    fread(p.flags, 1, p.info.nodes / 4 + (p.info.nodes & 3 ? 1 : 0), savefile);
+    
+    return true;
+}
+
+char* status(){
+    switch(latest_request){
+        case LIST_GROUPS: return "list groups";
+        case LIST_ELEMENTS: return "list elements";
+        case LIST_COMBINATIONS: return "list combinations";
+        case LOOK_GROUP: return "list elements for group";
+        case PARTIAL_MATCH_GROUPS: return "match groups by part of name";
+        case PARTIAL_MATCH_ELEMENTS: return "match elements by part of name";
+        case FIND_ELEMENT_COMBO: return "find combinations with an element";
+        case NOTHING: return "idle";
+    }
+}
+
+bool game_exit(){
+    if(elements){
+        free(elements);
+        elements = NULL;
+    }
+
+    if(node_stack.nodes){
+        free(node_stack.nodes);
+        node_stack.nodes = NULL;
+    }
+
+    latest_request = NOTHING;
+    return true;
+}

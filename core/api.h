@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 bool new_game(const char* path);
-bool save(const char* path);
+bool save(const char* path, bool force);
 bool load(const char* path);
 bool game_exit();
 

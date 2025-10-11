@@ -86,10 +86,12 @@ int main(int argc, char** argv){
                 printf("Original: %s + %s = %s\n", combo.reagent1, combo.reagent2, ptr ? ptr : "<<Null>>");
             }
         }
-            */
+            
 
         for(char* ptr = partial_match_elements("g"); ptr; ptr = get_rest())
             puts(ptr);
+        */
 
+        save("test", false);
     }
 }
